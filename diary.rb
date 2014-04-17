@@ -167,6 +167,7 @@ module Diary
   end
 
   module Utils
+    extend self
 
     def mkdir_p p
       FileUtils.mkdir_p p
