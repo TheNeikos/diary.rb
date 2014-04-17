@@ -210,10 +210,8 @@ module Diary
 
 end
 
-
-Diary::Utils.mkdir_p Diary::Config::DIARYDIR
-
 if __FILE__ == $0
+  Diary::Utils.mkdir_p Diary::Config::DIARYDIR
   opts = Diary::Options.parse! ARGV
 
   cmd = opts.command.new opts.command_args
