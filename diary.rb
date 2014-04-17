@@ -60,7 +60,7 @@ module Diary
         file = filepath + Date.today.diaryfilename
         Diary::Utils.ensure_exists file, Diary::Config::DEFAULT_CONTENT
 
-        Diary::Utils.exec Diary::Config::EDITOR, Diary::Config::EDIT_OPTS, file
+        Diary::Utils.editor file
       end
 
     end
@@ -192,6 +192,10 @@ module Diary
     def diary_file?(f)
       File.basename(file) =~ /.*\.#{Diary::Config::FILE_EXT}/ and not
         FileTest.directory? file
+    end
+
+    def editor *args
+      exec ([Diary::Config::EDITOR, Diary::Config::EDIT_OPTS] + args).join(' ')
     end
 
     def exec(*args)
