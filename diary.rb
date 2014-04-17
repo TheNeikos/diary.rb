@@ -108,7 +108,7 @@ module Diary
 
   module Config
 
-    DIARYDIR = ENV['HOME'] + "/.diary"
+    DIARYDIR = ENV['HOME'] + "/diary"
 
     PAGEDIR = DIARYDIR + "/pages"
 
