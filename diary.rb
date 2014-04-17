@@ -77,6 +77,11 @@ module Diary
     class CatCommand < Command
 
       def run
+        # TODO: Works only for today. Not compatible
+        file = Diary::Config::PAGEDIR + "/" + Date.today.diarypath +
+          Date.today.diaryfilename
+
+        File.read(file).each_line { |l| puts l }
       end
 
     end
