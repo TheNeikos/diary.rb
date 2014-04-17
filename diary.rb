@@ -108,11 +108,11 @@ module Diary
       end
     end
 
-    EDIT = Diary::Commands::EditCommand
-    HELP = Diary::Commands::HelpCommand
-    CAT  = 3
-    VIEW = 4
-    GREP = 5
+    EDIT = EditCommand
+    HELP = HelpCommand
+    CAT  = CatCommand
+    VIEW = ViewCommand
+    GREP = GrepCommand
 
   end
 
