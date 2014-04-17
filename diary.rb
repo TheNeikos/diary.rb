@@ -194,7 +194,7 @@ module Diary
     end
 
     def exec(*args)
-      `#{args.join ' '}`
+      system args.join(' ')
     end
 
   end
