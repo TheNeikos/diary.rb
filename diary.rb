@@ -166,20 +166,7 @@ module Diary
       FileUtils.touch f
 
       File.open(f, "w") do |file|
-        c = if content.is_a? File
-          rd = content.read
-          content.close
-          rd
-
-        elsif File.exists? content
-          File.read content
-
-        else
-          content
-
-        end
-
-        file.write c
+        file.write content
       end
 
       nil
