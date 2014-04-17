@@ -36,24 +36,6 @@ end
 
 module Diary
 
-  module Config
-
-    DIARYDIR = ENV['HOME'] + "/.diary"
-
-    PAGEDIR = DIARYDIR + "/pages"
-
-    CONFFILE = DIARYDIR + "/diaryrc"
-
-    FILE_EXT = "cal"
-
-    EDITOR = ENV['EDITOR'] || "/usr/bin/vim"
-    EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
-
-    ENTRY_TIMEFMT = "%A, %m.%d.%Y"
-    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT)
-
-  end
-
   module Commands # enumeration foo
 
     class Command # kindof abstract
@@ -109,10 +91,11 @@ module Diary
     class GrepCommand < Command
 
       def run
-        grepargs = @args.join ' '
+        grepargs = (@args || []).join ' '
         files = Diary::Utils.all_diary_files
         Diary::Utils.exec "grep #{grepargs} #{files}"
       end
+
     end
 
     EDIT = EditCommand
@@ -123,13 +106,33 @@ module Diary
 
   end
 
+  module Config
+
+    DIARYDIR = ENV['HOME'] + "/.diary"
+
+    PAGEDIR = DIARYDIR + "/pages"
+
+    CONFFILE = DIARYDIR + "/diaryrc"
+
+    FILE_EXT = "cal"
+
+    EDITOR = ENV['EDITOR'] || "/usr/bin/vim"
+    EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
+
+    ENTRY_TIMEFMT = "%A, %m.%d.%Y"
+    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT)
+
+    DEFAULT_CMD = Diary::Commands::EDIT
+
+  end
+
   module Options
 
     attr_reader :options
 
     @options = OpenStruct.new
     @options.verbose = false
-    @options.command = Diary::Commands::EDIT
+    @options.command = Diary::Config::DEFAULT_CMD
     @options.command_args = nil
 
     PARSER = OptionParser.new do |opts|
