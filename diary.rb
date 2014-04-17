@@ -50,55 +50,7 @@ module Diary
     EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
 
     ENTRY_TIMEFMT = "%A, %m.%d.%Y"
-    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(Diary::Config::ENTRY_TIMEFMT)
-
-  end
-
-  module Options
-
-    options = OpenStruct.new
-    options.verbose = false
-    options.command = Diary::Commands::EDIT
-    options.command_args = nil
-
-    PARSER = OptParser.new do |opts|
-
-      opts.banner = "#{$0} [OPTIONS]"
-
-      opts.on("edit ARGS", "Edit the current day") do |args|
-        options.command = Diary::Commands::EDIT
-        options.command_args = args
-      end
-
-      opts.on("help", "-h", "--help", "Show help") do
-        options.command = Diary::Commands::HELP
-      end
-
-      opts.on("cat ARGS", "Cat the current date") do |args|
-        options.command = Diary::Commands::CAT
-        options.command_args = args
-      end
-
-      opts.on("view ARGS", "View the current date") do |args|
-        options.command = Diary::Commands::VIEW
-        options.command_args = args
-      end
-
-      opts.on("grep ARGS", "Grep for something") do |args|
-        options.command = Diary::Commands::GREP
-        options.command_args = args
-      end
-
-    end
-
-    def parse!(argv)
-      Diary::Options::PARSER.parse! argv
-      options
-    end
-
-    def help
-      Diary::Options::PARSER.help
-    end
+    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT)
 
   end
 
@@ -160,6 +112,56 @@ module Diary
         files = Diary::Utils.all_diary_files
         Diary::Utils.exec "grep #{grepargs} #{files}"
       end
+    end
+
+  end
+
+  module Options
+
+    attr_reader :options
+
+    @options = OpenStruct.new
+    @options.verbose = false
+    @options.command = Diary::Commands::EDIT
+    @options.command_args = nil
+
+    PARSER = OptionParser.new do |opts|
+
+      opts.banner = "#{$0} [OPTIONS]"
+
+      opts.on("edit ARGS", "Edit the current day") do |args|
+        @options.command = Diary::Commands::EDIT
+        @options.command_args = args
+      end
+
+      opts.on("help", "-h", "--help", "Show help") do
+        @options.command = Diary::Commands::HELP
+      end
+
+      opts.on("cat ARGS", "Cat the current date") do |args|
+        @options.command = Diary::Commands::CAT
+        @options.command_args = args
+      end
+
+      opts.on("view ARGS", "View the current date") do |args|
+        @options.command = Diary::Commands::VIEW
+        @options.command_args = args
+      end
+
+      opts.on("grep ARGS", "Grep for something") do |args|
+        @options.command = Diary::Commands::GREP
+        @options.command_args = args
+      end
+
+    end
+
+    def self.parse!(argv)
+      Diary::Options::PARSER.parse! argv
+      @options
+    end
+
+    def self.help
+      Diary::Options::PARSER.help
     end
 
   end
