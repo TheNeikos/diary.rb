@@ -48,7 +48,7 @@ module Diary
     EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
 
     ENTRY_TIMEFMT = "%A, %m.%d.%Y"
-    DEFAULT_CONTENT = "                         #{Date.today.strftime Diary::Config::ENTRY_TIMEFMT}"
+    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(Diary::Config::ENTRY_TIMEFMT)
 
   end
 
