@@ -19,6 +19,8 @@ require 'yaml'
 require 'optparse'
 require 'date'
 require 'find'
+require 'ostruct'
+require 'fileutils'
 
 class Date
 
