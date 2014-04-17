@@ -58,7 +58,7 @@ module Diary
         Diary::Utils.mkdir_p filepath
 
         file = filepath + Date.today.diaryfilename
-        Diary::Utils.create(file, Diary::Config::DEFAULT_CONTENT)
+        Diary::Utils.ensure_exists(file, Diary::Config::DEFAULT_CONTENT)
 
         Diary::Utils.exec(Diary::Config::EDITOR, Diary::Config::EDIT_OPTS, file)
       end
@@ -160,7 +160,9 @@ module Diary
       FileUtils.mkdir_p p
     end
 
-    def create(f, content)
+    def ensure_exists(f, content)
+      return nil if File.exists? f # we don't touch anything if the file exists
+
       FileUtils.touch f
 
       File.open(f, "w") do |file|
