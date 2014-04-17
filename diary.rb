@@ -176,7 +176,7 @@ module Diary
       FileUtils.touch f
 
       File.open(f, "w") do |file|
-        file.write content
+        file.puts content
       end
 
       nil
