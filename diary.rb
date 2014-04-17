@@ -128,50 +128,27 @@ module Diary
 
   module Options
 
-    attr_reader :options
-
-    @options = OpenStruct.new
-    @options.verbose = false
-    @options.command = Diary::Config::DEFAULT_CMD
-    @options.command_args = nil
-
-    PARSER = OptionParser.new do |opts|
-
-      opts.banner = "#{$0} [OPTIONS]"
-
-      opts.on("edit ARGS", "Edit the current day") do |args|
-        @options.command = Diary::Commands::EDIT
-        @options.command_args = args
-      end
-
-      opts.on("help", "-h", "--help", "Show help") do
-        @options.command = Diary::Commands::HELP
-      end
-
-      opts.on("cat ARGS", "Cat the current date") do |args|
-        @options.command = Diary::Commands::CAT
-        @options.command_args = args
-      end
-
-      opts.on("view ARGS", "View the current date") do |args|
-        @options.command = Diary::Commands::VIEW
-        @options.command_args = args
-      end
-
-      opts.on("grep ARGS", "Grep for something") do |args|
-        @options.command = Diary::Commands::GREP
-        @options.command_args = args
-      end
-
-    end
-
     def self.parse!(argv)
-      Diary::Options::PARSER.parse! argv
-      @options
+      options = OpenStruct.new
+      options.verbose = false
+      options.command = Diary::Config::DEFAULT_CMD
+      options.command_args = nil
+
+      options.command = decide_command ARGV.shift
+      options.command_args = ARGV.clone
+
+      options
     end
 
-    def self.help
-      Diary::Options::PARSER.help
+    def self.decide_command c
+      case c
+      when "edit" then Diary::Commands::EDIT
+      when "cat"  then Diary::Commands::CAT
+      when "view" then Diary::Commands::VIEW
+      when "grep" then Diary::Commands::GREP
+      else
+        Diary::Commands::EDIT
+      end
     end
 
   end
