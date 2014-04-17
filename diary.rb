@@ -40,9 +40,9 @@ module Diary
 
     DIARYDIR = ENV['HOME'] + "/.diary"
 
-    PAGEDIR = Diary::Config::DIARYDIR + "/pages"
+    PAGEDIR = DIARYDIR + "/pages"
 
-    CONFFILE = Diary::Config::DIARYDIR + "/diaryrc"
+    CONFFILE = DIARYDIR + "/diaryrc"
 
     FILE_EXT = "cal"
 
