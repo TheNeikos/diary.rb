@@ -99,6 +99,13 @@ module Diary
 
     end
 
+    class ViewCommand < Command
+
+      def run
+      end
+
+    end
+
     class GrepCommand < Command
 
       def run
