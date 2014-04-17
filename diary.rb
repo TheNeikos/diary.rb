@@ -89,6 +89,11 @@ module Diary
     class ViewCommand < Command
 
       def run
+        # TODO: Works only for today. Not compatible
+        file = Diary::Config::PAGEDIR + "/" + Date.today.diarypath +
+          Date.today.diaryfilename
+
+        Diary::Utils.editor file
       end
 
     end
