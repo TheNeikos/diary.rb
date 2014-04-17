@@ -56,12 +56,6 @@ module Diary
 
   module Commands # enumeration foo
 
-    EDIT = Diary::Commands::EditCommand
-    HELP = Diary::Commands::HelpCommand
-    CAT  = 3
-    VIEW = 4
-    GREP = 5
-
     class Command # kindof abstract
 
       attr_reader :args
@@ -113,6 +107,12 @@ module Diary
         Diary::Utils.exec "grep #{grepargs} #{files}"
       end
     end
+
+    EDIT = Diary::Commands::EditCommand
+    HELP = Diary::Commands::HelpCommand
+    CAT  = 3
+    VIEW = 4
+    GREP = 5
 
   end
 
