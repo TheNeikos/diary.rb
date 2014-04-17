@@ -29,7 +29,7 @@ class Date
   end
 
   def diaryfilename
-    self.strftime("/%d.#{Diary::Config::FILE_EXT}")
+    self.strftime "/%d.#{Diary::Config::FILE_EXT}"
   end
 
 end
@@ -42,7 +42,7 @@ module Diary
 
       attr_reader :args
 
-      def initialize(args)
+      def initialize args
         @args = args
       end
 
@@ -54,13 +54,13 @@ module Diary
     class EditCommand < Command
 
       def run
-        filepath  = Diary::Config::PAGEDIR + "/" + Date.today.diarypath
+        filepath = Diary::Config::PAGEDIR + "/" + Date.today.diarypath
         Diary::Utils.mkdir_p filepath
 
         file = filepath + Date.today.diaryfilename
-        Diary::Utils.ensure_exists(file, Diary::Config::DEFAULT_CONTENT)
+        Diary::Utils.ensure_exists file, Diary::Config::DEFAULT_CONTENT
 
-        Diary::Utils.exec(Diary::Config::EDITOR, Diary::Config::EDIT_OPTS, file)
+        Diary::Utils.exec Diary::Config::EDITOR, Diary::Config::EDIT_OPTS, file
       end
 
     end
@@ -93,7 +93,7 @@ module Diary
       def run
         grepargs = (@args || []).join ' '
         files = Diary::Utils.all_diary_files
-        Diary::Utils.exec "grep #{grepargs} #{files}"
+        Diary::Utils.exec "grep " + [grepargs, files.join(' ')].join(' ')
       end
 
     end
@@ -130,12 +130,12 @@ module Diary
 
     def self.parse!(argv)
       options = OpenStruct.new
-      options.verbose = false
-      options.command = Diary::Config::DEFAULT_CMD
-      options.command_args = nil
+      options.verbose       = false
+      options.command       = Diary::Config::DEFAULT_CMD
+      options.command_args  = nil
 
-      options.command = decide_command ARGV.shift
-      options.command_args = ARGV.clone
+      options.command       = decide_command ARGV.shift
+      options.command_args  = ARGV.clone
 
       options
     end
@@ -167,9 +167,16 @@ module Diary
 
       File.open(f, "w") do |file|
         c = if content.is_a? File
+          rd = content.read
+          content.close
+          rd
+
+        elsif File.exists? content
           File.read content
+
         else
           content
+
         end
 
         file.write c
@@ -179,20 +186,20 @@ module Diary
     end
 
     def all_diary_files
-      f = []
+      fs = []
 
       begin
-        Find.find(Diary::Config::PAGEDIR) do |file|
-          next if FileTest.directory? file
-          if File.basename(file) =~ /.*\.#{Diary::Config::FILE_EXT}/
-            f << file
-          end
-        end
+        Find.find(Diary::Config::PAGEDIR) { |f| fs << f if diary_file? f }
       rescue Errno::ENOENT
         $stderr.puts "Cannot find #{Diary::Config::PAGEDIR}"
       end
 
-      f
+      fs
+    end
+
+    def diary_file?(f)
+      File.basename(file) =~ /.*\.#{Diary::Config::FILE_EXT}/ and not
+        FileTest.directory? file
     end
 
     def exec(*args)
