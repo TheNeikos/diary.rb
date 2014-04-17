@@ -60,7 +60,7 @@ module Diary
         file = filepath + Date.today.diaryfilename
         Diary::Utils.create(file, Diary::Config::DEFAULT_CONTENT)
 
-        Diary::Utils.exec(Dairy::Config::EDITOR, Diary::Config::EDIT_OPTS, file)
+        Diary::Utils.exec(Diary::Config::EDITOR, Diary::Config::EDIT_OPTS, file)
       end
 
     end
