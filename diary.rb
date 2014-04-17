@@ -164,7 +164,12 @@ module Diary
       FileUtils.touch f
 
       File.open(f, "w") do |file|
-        c = content.is_a? File ? File.read(content) : content
+        c = if content.is_a? File
+          File.read content
+        else
+          content
+        end
+
         file.write c
       end
 
