@@ -120,7 +120,7 @@ module Diary
     EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
 
     ENTRY_TIMEFMT = "%A, %m.%d.%Y"
-    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT)
+    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT) + "\n"
 
     DEFAULT_CMD = Diary::Commands::EDIT
 
