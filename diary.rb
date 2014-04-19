@@ -151,6 +151,10 @@ module Diary
     end
 
     def self.decide_command c
+      if helper_command c
+        help
+        exit 1
+      end
       case c
       when "edit" then Diary::Commands::EDIT
       when "cat"  then Diary::Commands::CAT
@@ -159,6 +163,23 @@ module Diary
       else
         Diary::Commands::EDIT
       end
+    end
+
+    def self.helper_command c
+      c == "-h" or c == "--help" || c == "help"
+    end
+
+    def self.help
+      puts <<EOS
+    ruby #{$0} [options]
+
+    edit        -- edit the current day (default)
+    cat [time]  -- cat a range of days
+    view [date] -- view a date in the editor
+    grep [expr] -- grep for expression
+
+    Copyright 2014 (c) Matthias Beyer
+EOS
     end
 
   end
@@ -217,5 +238,5 @@ if __FILE__ == $0
 
   cmd = opts.command.new opts.command_args
 
-  cmd.run
+  puts cmd
 end
