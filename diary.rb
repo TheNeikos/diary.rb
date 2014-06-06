@@ -137,8 +137,9 @@ module Diary
   end
 
   module Options
+    extend self
 
-    def self.parse!(argv)
+    def parse!(argv)
       options = OpenStruct.new
       options.verbose       = false
       options.command       = Diary::Config::DEFAULT_CMD
@@ -150,7 +151,7 @@ module Diary
       options
     end
 
-    def self.decide_command c
+    def decide_command c
       if helper_command c
         help
         exit 1
@@ -165,11 +166,11 @@ module Diary
       end
     end
 
-    def self.helper_command c
+    def helper_command c
       %w(-h --help help).include? c
     end
 
-    def self.help
+    def help
       puts <<EOS
     ruby #{$0} [options]
 
