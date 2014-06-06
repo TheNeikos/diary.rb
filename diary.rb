@@ -103,7 +103,7 @@ module Diary
       def run
         grepargs = (@args || []).join ' '
         files = Diary::Utils.all_diary_files
-        Diary::Utils.exec "grep " + [grepargs, files.join(' ')].join(' ')
+        Diary::Utils.exec "grep " + ([grepargs] + files).join(' ')
       end
 
     end
