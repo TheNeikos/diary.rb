@@ -166,7 +166,7 @@ module Diary
     end
 
     def self.helper_command c
-      c == "-h" or c == "--help" || c == "help"
+      %w(-h --help help).include? c
     end
 
     def self.help
