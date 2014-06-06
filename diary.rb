@@ -221,7 +221,7 @@ EOS
     end
 
     def editor *args
-      exec ([Diary::Config::EDITOR, Diary::Config::EDIT_OPTS] + args).join(' ')
+      exec ([Diary::Config::EDITOR, Diary::Config::EDIT_OPTS] + args)
     end
 
     def exec(*args)
