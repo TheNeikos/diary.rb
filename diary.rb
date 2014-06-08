@@ -157,11 +157,10 @@ module Diary
         exit 1
       end
       case c
-      when "edit" then Diary::Commands::EDIT
       when "cat"  then Diary::Commands::CAT
       when "view" then Diary::Commands::VIEW
       when "grep" then Diary::Commands::GREP
-      else
+      else # when "edit"
         Diary::Commands::EDIT
       end
     end
