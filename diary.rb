@@ -49,13 +49,19 @@ module Diary
       def run
         raise "Not implemented"
       end
+
+      protected
+
+      def diarypath(ext = "")
+        Diary::Config::PAGEDIR + "/" + Date.today.diarypath + ext
+      end
+
     end
 
     class EditCommand < Command
 
       def run
-        filepath = Diary::Config::PAGEDIR + "/" + Date.today.diarypath
-        Diary::Utils.mkdir_p filepath
+        filepath = diarypath Diary::Utils.mkdir_p filepath
 
         file = filepath + Date.today.diaryfilename
         Diary::Utils.ensure_exists file, Diary::Config::DEFAULT_CONTENT
@@ -78,8 +84,7 @@ module Diary
 
       def run
         # TODO: Works only for today. Not compatible
-        file = Diary::Config::PAGEDIR + "/" + Date.today.diarypath +
-          Date.today.diaryfilename
+        file = diarypath Date.today.diaryfilename
 
         puts File.read(file)
       end
@@ -90,8 +95,7 @@ module Diary
 
       def run
         # TODO: Works only for today. Not compatible
-        file = Diary::Config::PAGEDIR + "/" + Date.today.diarypath +
-          Date.today.diaryfilename
+        file = diarypath Date.today.diaryfilename
 
         Diary::Utils.editor file
       end
