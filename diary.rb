@@ -81,7 +81,7 @@ module Diary
         file = Diary::Config::PAGEDIR + "/" + Date.today.diarypath +
           Date.today.diaryfilename
 
-        File.read(file).each_line { |l| puts l }
+        puts File.read(file)
       end
 
     end
