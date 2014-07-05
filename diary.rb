@@ -648,7 +648,8 @@ module Diary
       end
 
       def next_command!
-        cmd = @argv.unshift
+        cmd = @argv.shift
+        debug "Shifted #{cmd} from #{@argv}"
         raise "Not a command: #{cmd}" if not Command.is_command? cmd
 
         debug "Searching for #{cmd}"
