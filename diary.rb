@@ -85,6 +85,14 @@ module Diary
 
   module CommandParser
 
+    module ExecuteableCommand
+
+      def action(tree)
+        raise NoMethodException.new "Not implemented"
+      end
+
+    end
+
     class Command
       attr_reader :keys, :attributes
 
