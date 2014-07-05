@@ -169,10 +169,17 @@ module Diary
         start_date = a.split("..").first
         end_date = a.split("..").last
 
-        @start_year, @start_month, @start_day = parse_date start_date
-        @end_year, @end_month, @end_day = parse_date end_date
+        parse_start_date start_date
+        parse_start_date end_date
+      end
 
+      def parse_start_date start_date
+        @start_year, @start_month, @start_day = parse_date start_date
         @start_date = Date.parse("#{@start_year}-#{@start_month}-#{@start_day}")
+      end
+
+      def parse_end_date end_date
+        @end_year, @end_month, @end_day = parse_date end_date
         @end_date = Date.parse("#{@end_year}-#{@end_month}-#{@end_day}")
       end
 
