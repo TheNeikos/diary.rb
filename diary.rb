@@ -70,7 +70,17 @@ class Options < Hash
 
 end
 
+module ConfigReader
+
+  def config=(c)
+    raise "Not a configuration: #{c.class} : #{c}" unless c.is_a? Config
+    @config = c
+  end
+
+end
+
 class Entry
+  include ConfigReader
 
   attr_accessor :time
   attr_reader :content, :raw
@@ -84,6 +94,7 @@ class Entry
 end
 
 class Day
+  include ConfigReader
 
   attr_accessor :entries
 
@@ -94,6 +105,7 @@ class Day
 end
 
 class Month
+  include ConfigReader
 
   attr_accessor :days
   attr_reader :month_index
@@ -110,6 +122,7 @@ class Month
 end
 
 class Year
+  include ConfigReader
 
   attr_accessor :months
 
