@@ -166,6 +166,10 @@ module Diary
 
       @expected_attr_count = [ 0 ]
 
+      def initialize(name)
+        @tagname = name
+      end
+
       # Take
       #
       #   1) All entries which are tagged
