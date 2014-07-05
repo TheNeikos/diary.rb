@@ -136,6 +136,23 @@ class Day
     @entries = entries
   end
 
+  def self.from_path(path)
+    @index = self.index_from_path(path)
+    @entries = self.entries_from_path(path)
+  end
+
+  protected
+
+  def self.index_from_path(path)
+    path.match(/[0-9]{2,2}$/).to_s.to_i
+  end
+
+  def self.entries_from_path(path)
+    Dir.new(path).entries.select { |sub| File.file? sub }.map do |entry|
+      Entry.from_path(path + "/" + entry)
+    end
+  end
+
 end
 
 class Month
