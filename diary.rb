@@ -644,7 +644,7 @@ module Diary
       protected
 
       def debug(str)
-        puts str if @config[:verbose]
+        puts str if @config[:debug]
       end
 
       def next_command!
@@ -957,7 +957,7 @@ module Diary
 end
 
 if __FILE__ == $0
-  cp = Diary::CommandParser::Parser.new(ARGV, {:verbose => true})
+  cp = Diary::CommandParser::Parser.new(ARGV, {:debug => true})
   puts "Available: #{cp.available_commands.map(&:keys).flatten}"
   cp.parse!
 
