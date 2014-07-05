@@ -168,13 +168,18 @@ module Diary
 
       # Take
       #
-      # 1) All entries which are tagged
+      #   1) All entries which are tagged
       #
-      # 2) All days and its entries which are tagged
+      #   2) All days and its entries which are tagged
       #
-      # 3) All months, its days and its entries which are tagged
+      #   3) All months, its days and its entries which are tagged
       #
-      # 4) All years, its months and days and entries which are tagged
+      #   4) All years, its months and days and entries which are tagged
+      #
+      # After that we remove the entries, days, months and years (in this order)
+      # from the tree, to ensure entries which are kept, are also kept if the
+      # appropriate year for the entry is not kept
+      #
       def filter_tree tree
         years = filter_years tree.years
         months = filter_months(tree.years.select { |y| not years.include? y })
