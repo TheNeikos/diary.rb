@@ -95,6 +95,13 @@ module Diary
 
     end
 
+    module ExtendedQueryCommand
+      # nothing yet
+      #
+      # shows that a command can be executed _before_ actually parsing the file
+      # tree
+    end
+
     class Command
       attr_reader :keys, :attributes
 
