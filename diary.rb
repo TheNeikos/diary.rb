@@ -135,9 +135,10 @@ module Diary
     end
 
     def self.from_path(path)
-      @time = self.time_from_path(path)
-      @raw = File.read path
-      @content = @raw.encode(Encoding::UTF_8)
+      time = self.time_from_path(path)
+      raw = File.read path
+
+      Entry.new(time, raw)
     end
 
     protected
