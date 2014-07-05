@@ -164,6 +164,9 @@ module Diary
 
         @start_year, @start_month, @start_day = parse_date start_date
         @end_year, @end_month, @end_day = parse_date end_date
+
+        @start_date = Date.parse("#{@start_year}-#{@start_month}-#{@start_day}")
+        @end_date = Date.parse("#{@end_year}-#{@end_month}-#{@end_day}")
       end
 
       def parse_date str
