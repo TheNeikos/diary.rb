@@ -396,4 +396,48 @@ module Diary
 
   end
 
+  class Tree
+    include CreateAbleFromPath
+    include Iterateable
+
+    @years = []
+
+    def self.from_path(path,  create_subs = false)
+      @path = path
+
+      if create_subs
+        @years = self.subs_from_path(path, Year, lambda { |e| File.directory? e })
+      end
+    end
+
+    def keep_entries entries
+      @years.each do |year|
+        year.months.each do |month|
+          month.days.each do |day|
+            day.entries.delete_if { |e| not entries.include? e }
+          end
+        end
+      end
+    end
+
+    def keep_days days
+      @years.each do |year|
+        year.months.each do |month|
+          month.days.delete_if { |d| not days.include? d }
+        end
+      end
+    end
+
+    def keep_months months
+      @years.each do |year|
+        year.months.delete_if { |m| not months.include? m }
+      end
+    end
+
+    def keep_years years
+      @years.delete_if { |y| not years.include? y }
+    end
+
+  end
+
 end
