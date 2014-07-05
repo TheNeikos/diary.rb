@@ -604,7 +604,8 @@ module Diary
 
   class Executer
 
-    def initalize(commands)
+    def initalize(config, commands)
+      @config = config
       @commands = commands
       raise "Invalid command state..." if not valid?
     end
