@@ -118,8 +118,10 @@ class Day
   include CreateAbleFromPath
 
   attr_accessor :entries
+  attr_reader :day_index
 
-  def initialize(entries)
+  def initialize(entries, day_index = false)
+    @day_index = day_index || Date.today.day
     @entries = entries
   end
 
