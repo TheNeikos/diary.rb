@@ -155,6 +155,18 @@ module Diary
     class QueryCommand < Command
     end
 
+    class ListCommand < QueryCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ QueryCommand ]
+
+      def action!(tree)
+        tree.all_entries.each do |entry|
+          puts "[#{entry.hash}] #{entry.time}"
+        end
+      end
+    end
+
     class CatCommand < QueryCommand
       include InstanceAbleCommand
       include ExecuteableCommand
