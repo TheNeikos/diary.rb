@@ -27,6 +27,7 @@ class Config < Hash
   # defaults
   def initialize(other_config_path = false)
     self[:root] = Dir.home + "/.diary"
+    self[:content_dir] = self[:root] + "/content"
     self[:cfg] = other_config_path || self[:root] + "/diary.conf"
 
     self[:ext] = "txt"
@@ -89,6 +90,8 @@ end
 
 module CreateAbleFromPath
 
+  attr_reader :path
+
   def self.from_path(path)
     raise NoMethodException.new("Not implemented")
   end
@@ -149,6 +152,24 @@ class Year
   def initialize(months, y = false)
     @year = y || Date.today.year
     @months = months
+  end
+
+  def self.from_path(path)
+    @path = path
+    @year = self.year_from_path path
+    @months = self.months_under path
+  end
+
+  protected
+
+  def self.year_from_path path
+    path.match(/[0-9]{4,4}$/).to_s.to_i
+  end
+
+  def self.months_undex path
+    Dir.new(path).entries.select { |sub| File.directory? sub }.map do |month|
+      Month.from_path(path + "/" + month)
+    end
   end
 
 end
