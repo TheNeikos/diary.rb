@@ -110,7 +110,11 @@ module Diary
 
     end
 
-    module InstanceAbleCommand; end
+    module InstanceAbleCommand
+      attr_reader :compatible_commands, :noncompatible_commands
+      @compatible_commands = []
+      @noncompatible_commands = []
+    end
 
     class Command
       attr_reader :keys, :attributes
