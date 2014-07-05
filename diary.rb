@@ -109,6 +109,14 @@ module Indexable
 
 end
 
+module Iterateable
+
+  def each &block
+    raise NoMethodException.new("Not implemented")
+  end
+
+end
+
 class Entry
   include ConfigReader
   include CreateAbleFromPath
@@ -141,12 +149,17 @@ class Day
   include ConfigReader
   include CreateAbleFromPath
   include Indexable
+  include Iterateable
 
   attr_accessor :entries
 
   def initialize(entries, day_index = false)
     @index = day_index || Date.today.day
     @entries = entries
+  end
+
+  def each &block
+    @entries.each(&block)
   end
 
   def self.from_path(path)
@@ -172,12 +185,17 @@ class Month
   include ConfigReader
   include CreateAbleFromPath
   include Indexable
+  include Iterateable
 
   attr_accessor :days
 
   def initialize(days, month_index = false)
     @index = month_index || Date.today.month
     @days = days
+  end
+
+  def each &block
+    @days.each(&block)
   end
 
   def name
@@ -206,12 +224,17 @@ end
 class Year
   include ConfigReader
   include CreateAbleFromPath
+  include Iterateable
 
   attr_accessor :months
 
   def initialize(months, y = false)
     @year = y || Date.today.year
     @months = months
+  end
+
+  def each &block
+    @months.each(&block)
   end
 
   def self.from_path(path)
