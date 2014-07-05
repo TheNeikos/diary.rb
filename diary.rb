@@ -512,6 +512,29 @@ module Diary
         next_command! until @argv.empty?
       end
 
+      def available_commands
+        [
+          Command,
+          QueryCommand,
+          CatCommand,
+          CatLastCommand,
+          LimitCommand,
+          LimitRangeCommand,
+          LimitInCommand,
+          LimitYearCommand,
+          LimitMonthCommand,
+          LimitDayCommand,
+          FilterCommand,
+          TagFilterCommand,
+          CategoryFilterCommand,
+          ModifyCommand,
+          EditCommand,
+          TagCommand,
+          CategorizeCommand,
+          AddCommand
+        ].select { |s| s.is_a? InstanceAbleCommand }
+      end
+
       protected
 
       def next_command!
@@ -545,29 +568,6 @@ module Diary
 
         raise "Possibly not enough arguments for #{c}" if not i.zero?
         instance
-      end
-
-      def available_commands
-        [
-          Command,
-          QueryCommand,
-          CatCommand,
-          CatLastCommand,
-          LimitCommand,
-          LimitRangeCommand,
-          LimitInCommand,
-          LimitYearCommand,
-          LimitMonthCommand,
-          LimitDayCommand,
-          FilterCommand,
-          TagFilterCommand,
-          CategoryFilterCommand,
-          ModifyCommand,
-          EditCommand,
-          TagCommand,
-          CategorizeCommand,
-          AddCommand
-        ].select { |s| s.is_a? InstanceAbleCommand }
       end
 
     end
