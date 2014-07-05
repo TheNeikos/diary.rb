@@ -89,6 +89,8 @@ module Diary
       attr_reader :key, :attributes
 
       @expected_attr_count = 0
+      @key = nil
+      @attributes = []
 
       def expected_attr_count
         if self.class == Command
