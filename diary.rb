@@ -145,6 +145,23 @@ class Month
     Date::MONTHNAMES[@month_index].downcase
   end
 
+  def self.from_path(path)
+    @month_index = self.index_from_path(path)
+    @days = self.days_from_path(path)
+  end
+
+  protected
+
+  def self.index_from_path(path)
+    path.match(/[0-9]{2,2}$/).to_s.to_i
+  end
+
+  def self.days_from_path(path)
+    Dir.new(path).entries.select { |sub| File.directory? sub }.map do |day|
+      Day.from_path(path + "/" + day)
+    end
+  end
+
 end
 
 class Year
