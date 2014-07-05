@@ -125,7 +125,7 @@ module Diary
     class Command
       attr_reader :keys, :attributes, :expected_attr_count
 
-      @expected_attr_count = [] # all valid command attribute numbers, can be a range
+      @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
       @attributes = []
 
       def self.keys
@@ -177,7 +177,7 @@ module Diary
 
       @@noncompatible_commands = [ QueryCommand ]
 
-      @expected_attr_count = [0, 1]
+      @expected_attr_count = (0..1)
 
       def self.keys
         ["--cat", "-c"]
@@ -253,7 +253,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitCommand ]
 
-      @expected_attr_count = [ 1 ] # only one
+      @expected_attr_count = (1..1) # only one
 
       def self.keys
         [ "--between", "-b" ]
@@ -360,7 +360,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
 
       @attributes = []
 
@@ -382,7 +382,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
       @attributes = []
 
       def self.keys
@@ -403,7 +403,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
       @attributes = []
 
       def self.keys
@@ -487,7 +487,7 @@ module Diary
     class TagFilterCommand < FilterCommand
       include InstanceAbleCommand
 
-      @expected_attr_count = [ 0 ]
+      @expected_attr_count = (0..0)
 
       def self.keys
         []
