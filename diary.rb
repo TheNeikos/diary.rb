@@ -23,6 +23,20 @@ require 'find'
 require 'ostruct'
 require 'fileutils'
 
+class Hash
+
+  def transform_to_symbol_hash
+    each_with_object({}) do |(k,v), h|
+      if v.is_a?(Hash)
+        v = v.transform_to_symbol_hash
+      end
+      h[k.to_sym] = v # Turns {'a'=>1} to {:a=>1}
+    end
+  end
+
+end
+
+
 module Diary
 
   class Config < Hash
@@ -80,6 +94,10 @@ module Diary
 
       [key, value]
     end
+
+  end
+
+  module Helpers
 
   end
 
@@ -189,19 +207,19 @@ module Diary
     include CreateAbleFromPath
     include Indexable
 
-    attr_accessor :time
+    attr_accessor :time, :meta
     attr_reader :content, :raw
 
-    def initialize(time, content)
+    def initialize(time, data)
       @time = time
-      @content = content.encode(Encoding::UTF_8)
-      @raw = content
+      @content = data[:content].encode(Encoding::UTF_8)
+      @raw = data[:content]
+      @meta = data[:meta]
     end
 
     def self.from_path(path)
       time = self.time_from_path(path)
-      raw = File.read path
-
+      raw = transform_to_symbol_hash YAML.read_file(path)
       Entry.new(time, raw)
     end
 
