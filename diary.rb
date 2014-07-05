@@ -82,15 +82,6 @@ module Diary
 
   end
 
-  module ConfigReader
-
-    def config=(c)
-      raise "Not a configuration: #{c.class} : #{c}" unless c.is_a? Config
-      @config = c
-    end
-
-  end
-
   module CreateAbleFromPath
 
     attr_reader :path
@@ -130,7 +121,6 @@ module Diary
   end
 
   class Entry
-    include ConfigReader
     include CreateAbleFromPath
     include Indexable
 
@@ -158,7 +148,6 @@ module Diary
   end
 
   class Day
-    include ConfigReader
     include CreateAbleFromPath
     include Indexable
     include Iterateable
@@ -182,7 +171,6 @@ module Diary
   end
 
   class Month
-    include ConfigReader
     include CreateAbleFromPath
     include Indexable
     include Iterateable
@@ -210,7 +198,6 @@ module Diary
   end
 
   class Year
-    include ConfigReader
     include CreateAbleFromPath
     include Iterateable
 
