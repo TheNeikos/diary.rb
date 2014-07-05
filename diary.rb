@@ -162,6 +162,34 @@ module Diary
     end
 
     class CatLastCommand < CatCommand
+      include ExecuteableCommand
+      include ExtendedQueryCommand
+
+      def action(tree)
+        # `tree` should be empty, as this command is also a query command
+
+        year = latest_year Date.today.year
+        month = latest_month year
+        day = latest_day year, month
+        entry = latest_entry year, month, day
+
+        cat entry
+      end
+
+      protected
+
+      def latest_year(thisyear)
+      end
+
+      def latest_month(year)
+      end
+
+      def latest_day(year, month)
+      end
+
+      def latest_entry(year, month, day)
+      end
+
     end
 
     class LimitCommand < QueryCommand
