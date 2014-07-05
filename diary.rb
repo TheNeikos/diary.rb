@@ -155,12 +155,100 @@ module Diary
 
 
     class FilterCommand < QueryCommand
+
+      def filter_tree(tree)
+        tree
+      end
+
+      # Take
+      #
+      #   1) All entries which have the attribute
+      #
+      #   2) All days and its entries which have the attribute
+      #
+      #   3) All months, its days and its entries which have the attribute
+      #
+      #   4) All years, its months and days and entries which have the attribute
+      #
+      # After that we remove the entries, days, months and years (in this order)
+      # from the tree, to ensure entries which are kept, are also kept if the
+      # appropriate year for the entry is not kept
+      #
+      def filter_tree tree
+        years = filter_years tree.years
+        months = filter_months(tree.years.select { |y| not years.include? y })
+        days = filter_days(months.select { |m| not months.include? m })
+        entries = filter_entries(days.select { |d| not days.include? d })
+
+        # throw out the entries
+        tree.keep_entries entries
+
+        # then the days
+        tree.keep_days days
+
+        # then all other months
+        tree.keep_months months
+
+        # then all other years
+        tree.keep_years years
+
+        tree
+      end
+
+      protected
+
+      def filter(ary, meth)
+        raise NoMethodException.new "Not implemented"
+      end
+
+      def filter_years tree
+        filter([tree], :years)
+      end
+
+      def filter_months(years)
+        filter(years, :month)
+      end
+
+      def filter_days(months)
+        filter(months, :days)
+      end
+
+      def filter_entries(days)
+        filter(days, :entries)
+      end
+
     end
 
     class TagFilterCommand < FilterCommand
+
+      @expected_attr_count = [ 0 ]
+
+      def initialize(name)
+        @tagname = name
+      end
+
+      protected
+
+      # override
+      def filter(ary, meth)
+        ary.map(&meth).flatten.select { |x| x.tags.include? @tagname }
+      end
+
     end
 
     class CategoryFilterCommand < FilterCommand
+
+      def initialize(name)
+        @catname = name
+      end
+
+      protected
+
+      # override
+      def filter(ary, meth)
+        ary.map(&meth).flatten.select { |x| x.categories.include? @catname }
+      end
+
     end
 
 
@@ -333,6 +421,50 @@ module Diary
 
     def self.year_from_path path
       path.match(/[0-9]{4,4}$/).to_s.to_i
+    end
+
+  end
+
+  class Tree
+    include CreateAbleFromPath
+    include Iterateable
+
+    @years = []
+
+    def self.from_path(path,  create_subs = false)
+      @path = path
+
+      if create_subs
+        @years = self.subs_from_path(path, Year, lambda { |e| File.directory? e })
+      end
+    end
+
+    def keep_entries entries
+      @years.each do |year|
+        year.months.each do |month|
+          month.days.each do |day|
+            day.entries.delete_if { |e| not entries.include? e }
+          end
+        end
+      end
+    end
+
+    def keep_days days
+      @years.each do |year|
+        year.months.each do |month|
+          month.days.delete_if { |d| not days.include? d }
+        end
+      end
+    end
+
+    def keep_months months
+      @years.each do |year|
+        year.months.delete_if { |m| not months.include? m }
+      end
+    end
+
+    def keep_years years
+      @years.delete_if { |y| not years.include? y }
     end
 
   end
