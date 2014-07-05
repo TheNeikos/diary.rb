@@ -129,6 +129,7 @@ module Diary
     end
 
     class CatCommand < QueryCommand
+      include ExecuteableCommand
 
       @expected_attr_count = 0
       @keys = ["--cat", "-c"]
