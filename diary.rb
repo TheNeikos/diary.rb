@@ -83,6 +83,70 @@ module Diary
 
   end
 
+  module CommandParser
+
+    class Command
+      attr_reader :key, :attributes
+    end
+
+
+    class QueryCommand < Command
+    end
+
+    class CatCommand < QueryCommand
+    end
+
+    class CatLastCommand < CatCommand
+    end
+
+    class LimitCommand < QueryCommand
+    end
+
+    class LimitRangeCommand < LimitCommand
+    end
+
+
+    class LimitInCommand < LimitCommand
+    end
+
+    class LimitYearCommand < LimitInCommand
+    end
+
+    class LimitMonthCommand < LimitInCommand
+    end
+
+    class LimitDayCommand < LimitInCommand
+    end
+
+
+    class FilterCommand < QueryCommand
+    end
+
+    class TagFilterCommand < FilterCommand
+    end
+
+    class CategoryFilterCommand < FilterCommand
+    end
+
+
+    class ModifyCommand < Command
+    end
+
+    class EditCommand < ModifyCommand
+    end
+
+    class TagCommand < ModifyCommand
+    end
+
+    class CategorizeCommand < ModifyCommand
+    end
+
+
+    class AddCommand < Command
+    end
+
+  end
+
   module CreateAbleFromPath
 
     attr_reader :path
