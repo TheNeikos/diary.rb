@@ -135,22 +135,145 @@ module Diary
     end
 
     class LimitCommand < QueryCommand
+
+      def search_in?(path)
+        true
+      end
+
     end
 
     class LimitRangeCommand < LimitCommand
+
+      @expected_attr_count = [ 1 ] # only one
+      @keys = [ "--between", "-b" ]
+
+      # override
+      def add_attribute a
+        super.add_attribute a
+        parse_attribute a
+      end
+
+      def search_in? path
+        fmt = ""
+        fmt << "%Y/" if @start_year  || @end_year
+        fmt << "%m/" if @start_month || @end_month
+        fmt << "%d/" if @start_day   || @end_day
+
+        d = Date.strptime(path, fmt)
+        (@start_date..@end_date).include? d
+      end
+
+      protected
+
+      def parse_attribute a
+        start_date = a.split("..").first
+        end_date = a.split("..").last
+
+        parse_start_date start_date
+        parse_start_date end_date
+      end
+
+      def parse_start_date start_date
+        @start_year, @start_month, @start_day = parse_date start_date
+        @start_date = Date.parse("#{@start_year}-#{@start_month}-#{@start_day}")
+      end
+
+      def parse_end_date end_date
+        @end_year, @end_month, @end_day = parse_date end_date
+        @end_date = Date.parse("#{@end_year}-#{@end_month}-#{@end_day}")
+      end
+
+      def parse_date str
+        y, m, d = [nil, nil, nil]
+
+        parts = str.split("-")
+        nparts = parts.length
+
+        if nparts > 3 or nparts < 1
+          # something wents wrong
+          puts "Huh, date parsing fails"
+          raise "Date parsing went wrong, your date has not [1,2,3] parts"
+        end
+
+        d = parts.pop.to_i if nparts == 3
+        m = parts.pop.to_i if nparts <= 2
+        y = parts.pop.to_i if nparts <= 1
+
+        [y, m || 1, d || 1]
+      end
+
     end
 
 
-    class LimitInCommand < LimitCommand
+    class LimitInCommand < LimitRangeCommand
+
+      # override
+      def search_in? path
+        if @start_year and not path.include? @start_year.to_s
+          return false
+        end
+
+        if @start_month and not path.include? "#{@start_year}/#{@start_month}"
+          return false
+        end
+
+        if @start_day and not path.include? "#{@start_year}/#{@start_month}/#{@start_day}"
+          return false
+        end
+
+        return true
+      end
+
+      protected
+
+      # override
+      def parse_attribute a
+        # we only parse the start date here, as we only have one date.
+        parse_start_date a
+      end
+
     end
 
     class LimitYearCommand < LimitInCommand
+
+      @expected_attr_count = [ 1 ]
+      @keys = [ "--year" ]
+      @attributes = []
+
+      def search_in? path
+        y = @attribute.first
+
+        path.match(/#{y.to_s}\/[0-9]{2,2}\/[0-9]{2,2}\//)
+      end
+
     end
 
     class LimitMonthCommand < LimitInCommand
+
+      @expected_attr_count = [ 1 ]
+      @keys = [ "--year" ]
+      @attributes = []
+
+      def search_in? path
+        m = @attribute.first
+
+        path.match(/[0-9]{4,4}\/#{m}\/[0-9]{2,2}\//)
+      end
+
     end
 
     class LimitDayCommand < LimitInCommand
+
+      @expected_attr_count = [ 1 ]
+      @keys = [ "--year" ]
+      @attributes = []
+
+      def search_in? path
+        d = @attribute.first
+
+        path.match(/[0-9]{4,4}\/[0-9]{2,2}\/#{d}\//)
+      end
+
     end
 
 
