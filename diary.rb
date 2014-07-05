@@ -97,6 +97,12 @@ module CreateAbleFromPath
     raise NoMethodException.new("Not implemented")
   end
 
+  def self.subs_from_path(path, gen_class, &block)
+    Dir.new(path).entries.select(&block).map do |entry|
+      gen_class.from_path(path + "/" + entry)
+    end
+  end
+
 end
 
 module Indexable
@@ -168,15 +174,7 @@ class Day
 
   def self.from_path(path)
     @index = self.index_from_path(path, /[0-9]{2,2}$/)
-    @entries = self.entries_from_path(path)
-  end
-
-  protected
-
-  def self.entries_from_path(path)
-    Dir.new(path).entries.select { |sub| File.file? sub }.map do |entry|
-      Entry.from_path(path + "/" + entry)
-    end
+    @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
   end
 
 end
@@ -204,15 +202,7 @@ class Month
 
   def self.from_path(path)
     @index = self.index_from_path(path, /[0-9]{2,2}$/)
-    @days = self.days_from_path(path)
-  end
-
-  protected
-
-  def self.days_from_path(path)
-    Dir.new(path).entries.select { |sub| File.directory? sub }.map do |day|
-      Day.from_path(path + "/" + day)
-    end
+    @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
   end
 
 end
