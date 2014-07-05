@@ -174,7 +174,7 @@ module Diary
       @@noncompatible_commands = [ QueryCommand ]
 
       @expected_attr_count = [0, 1]
-      @keys = ["--cat", "-c"]
+      @@keys = ["--cat", "-c"]
 
       def action(tree)
         tree.each do |entry|
@@ -243,7 +243,7 @@ module Diary
       @@noncompatible_commands = [ LimitCommand ]
 
       @expected_attr_count = [ 1 ] # only one
-      @keys = [ "--between", "-b" ]
+      @@keys = [ "--between", "-b" ]
 
       # override
       def add_attribute a
@@ -343,7 +343,7 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
+      @@keys = [ "--year" ]
       @attributes = []
 
       def search_in? path
@@ -361,7 +361,7 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
+      @@keys = [ "--year" ]
       @attributes = []
 
       def search_in? path
@@ -379,7 +379,7 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
+      @@keys = [ "--year" ]
       @attributes = []
 
       def search_in? path
