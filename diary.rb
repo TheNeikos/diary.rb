@@ -226,6 +226,7 @@ module Diary
 
     class LimitRangeCommand < LimitCommand
       include InstanceAbleCommand
+      include ReaderCommand
 
       @@noncompatible_commands = [ LimitCommand ]
 
@@ -292,6 +293,7 @@ module Diary
 
     class LimitInCommand < LimitRangeCommand
       include InstanceAbleCommand
+      include ReaderCommand
 
       @@noncompatible_commands = [ LimitCommand ]
 
@@ -324,6 +326,7 @@ module Diary
 
     class LimitYearCommand < LimitInCommand
       include InstanceAbleCommand
+      include ReaderCommand
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
@@ -341,6 +344,7 @@ module Diary
 
     class LimitMonthCommand < LimitInCommand
       include InstanceAbleCommand
+      include ReaderCommand
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
@@ -358,6 +362,7 @@ module Diary
 
     class LimitDayCommand < LimitInCommand
       include InstanceAbleCommand
+      include ReaderCommand
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
