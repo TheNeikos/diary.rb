@@ -690,14 +690,17 @@ module Diary
       def create_instance!(c)
         instance = c.new()
 
-        i = 0
-        while i < instance.expected_attr_count.max || (not @argv.empty?) do
-          debug("Adding attribute to #{c} : #{@argv.first}")
-          instance.add_attribute(@argv.pop)
-          i += 1
+        0.upto(instance.expected_attr_count.max) do
+          break if @argv.empty?
+
+          if Command.is_command?(@argv.first)
+            debug("Not adding #{@argv.first} as arg to #{instance}")
+          else
+            debug("Adding attribute to #{c} : #{@argv.first}")
+            instance.add_attribute(@argv.pop)
+          end
         end
 
-        raise "Possibly not enough arguments for #{c}" if not i.zero?
         instance
       end
 
