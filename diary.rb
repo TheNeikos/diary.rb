@@ -498,6 +498,76 @@ module Diary
 
     end
 
+
+    class Parser
+
+      def initialize(argv)
+        @argv = argv
+        @commands = []
+      end
+
+      def parse!
+        next_command until @argv.empty?
+      end
+
+      def next_command
+        cmd = @argv.pop
+        raise "Not a command: #{cmd}" if not Command.is_command? cmd
+
+        commands = available_commands.select { |c| c.keys.include? cmd }
+
+        if commands.length.zero?
+          puts "Command not found: #{cmd}"
+          exit 1
+        end
+
+        if commands.length > 1
+          puts "Command seems to be not unique: #{cmd}"
+          exit 1
+        end
+
+        @commands << create_instance(commands.first)
+      end
+
+      def create_instance(c)
+        # decide which class this is, create the appropriate instance
+        instance = nil # TODO
+
+        i = instance.expected_attr_count
+        until i == 0 |n|
+          instance.add_attribute(@argv.pop)
+          i -= 1
+        end
+
+        raise "Possibly not enough arguments for #{c}" if not i.zero?
+        instance
+      end
+
+      def available_commands
+        [
+          Command,
+          QueryCommand,
+          CatCommand,
+          CatLastCommand,
+          LimitCommand,
+          LimitRangeCommand,
+          LimitInCommand,
+          LimitYearCommand,
+          LimitMonthCommand,
+          LimitDayCommand,
+          FilterCommand,
+          TagFilterCommand,
+          CategoryFilterCommand,
+          ModifyCommand,
+          EditCommand,
+          TagCommand,
+          CategorizeCommand,
+          AddCommand
+        ].select { |s| s.is_a? InstanceAbleCommand }
+      end
+
+    end
+
   end
 
   module CreateAbleFromPath
