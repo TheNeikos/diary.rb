@@ -105,17 +105,22 @@ module Diary
     class LimitRangeCommand < LimitCommand
     end
 
-    class LimitYearCommand < LimitCommand
+
+    class LimitInCommand < LimitCommand
     end
 
-    class LimitMonthCommand < LimitCommand
+    class LimitYearCommand < LimitInCommand
     end
 
-    class LimitDayCommand < LimitCommand
+    class LimitMonthCommand < LimitInCommand
     end
 
-    class LimitTimeCommand < LimitCommand
+    class LimitDayCommand < LimitInCommand
     end
+
+    class LimitTimeCommand < LimitInCommand
+    end
+
 
     class FilterCommand < QueryCommand
     end
