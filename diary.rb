@@ -199,7 +199,7 @@ module Diary
       end
 
       def touch path
-        # TODO
+        FileUtils.touch path
       end
 
       def call_editor path
