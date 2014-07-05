@@ -672,7 +672,7 @@ module Diary
 
         i = instance.expected_attr_count
         until i == 0 do
-          debug("Adding attribute to #{cmd} : #{@argv.first}")
+          debug("Adding attribute to #{c} : #{@argv.first}")
           instance.add_attribute(@argv.pop)
           i -= 1
         end
