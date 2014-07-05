@@ -107,6 +107,10 @@ module Indexable
     @index.to_s.rjust(n, "0")
   end
 
+  def self.index_from_path(path, regex)
+    path.match(regex).to_s.to_i
+  end
+
 end
 
 module Iterateable
@@ -163,15 +167,11 @@ class Day
   end
 
   def self.from_path(path)
-    @index = self.index_from_path(path)
+    @index = self.index_from_path(path, /[0-9]{2,2}$/)
     @entries = self.entries_from_path(path)
   end
 
   protected
-
-  def self.index_from_path(path)
-    path.match(/[0-9]{2,2}$/).to_s.to_i
-  end
 
   def self.entries_from_path(path)
     Dir.new(path).entries.select { |sub| File.file? sub }.map do |entry|
@@ -203,15 +203,11 @@ class Month
   end
 
   def self.from_path(path)
-    @index = self.index_from_path(path)
+    @index = self.index_from_path(path, /[0-9]{2,2}$/)
     @days = self.days_from_path(path)
   end
 
   protected
-
-  def self.index_from_path(path)
-    path.match(/[0-9]{2,2}$/).to_s.to_i
-  end
 
   def self.days_from_path(path)
     Dir.new(path).entries.select { |sub| File.directory? sub }.map do |day|
