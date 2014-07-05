@@ -108,6 +108,10 @@ module Diary
         end
       end
 
+      def add_attribute a
+        @attributes << a
+      end
+
       def self.is_command? str
         ["-", "+"].map { |e| str.start_with? e }.any?
       end
