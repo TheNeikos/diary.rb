@@ -671,11 +671,11 @@ module Diary
       def create_instance!(c)
         instance = c.new()
 
-        i = instance.expected_attr_count
-        until i == 0 do
+        i = 0
+        until (instance.expected_attr_count || []).include? i do
           debug("Adding attribute to #{c} : #{@argv.first}")
           instance.add_attribute(@argv.pop)
-          i -= 1
+          i += 1
         end
 
         raise "Possibly not enough arguments for #{c}" if not i.zero?
