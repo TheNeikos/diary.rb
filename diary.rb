@@ -131,14 +131,17 @@ module Diary
     class CatCommand < QueryCommand
       include ExecuteableCommand
 
-      @expected_attr_count = 0
+      @expected_attr_count = [0, 1]
       @keys = ["--cat", "-c"]
-      @attributes = [] # for sure.
 
       def action(tree)
         tree.each do |entry|
-          puts "--- #{entry.time}"
-          puts entry.content
+          if @attributes.include? "raw"
+            puts entry.raw
+          else
+            puts "--- #{entry.time}"
+            puts entry.content
+          end
           puts ""
         end
       end
