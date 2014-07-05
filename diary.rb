@@ -574,6 +574,35 @@ module Diary
 
   end
 
+  class Executer
+
+    def initalize(commands)
+      @commands = commands
+    end
+
+    def execute!
+    end
+
+    protected
+
+    def filter_commands
+      only_commands FilterCommand
+    end
+
+    def limit_commands
+      only_commands LimitCommand
+    end
+
+    def query_commands
+      only_commands QueryCommand
+    end
+
+    def only klass
+      @commands.select { |c| c.is_a? klass }
+    end
+
+  end
+
   module CreateAbleFromPath
 
     attr_reader :path
