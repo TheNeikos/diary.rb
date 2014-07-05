@@ -97,10 +97,6 @@ module Diary
 
   end
 
-  module Helpers
-
-  end
-
   module CommandParser
 
     class Command
