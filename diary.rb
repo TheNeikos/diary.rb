@@ -491,29 +491,6 @@ module Diary
     end
 
 
-    class ModifyCommand < Command
-    end
-
-    class EditCommand < ModifyCommand
-      include InstanceAbleCommand
-
-      @@noncompatible_commands = [ LimitCommand, FilterCommand,
-                                  ModifyCommand, AddCommand ]
-    end
-
-    class TagCommand < ModifyCommand
-      include InstanceAbleCommand
-
-      @@noncompatible_commands = [ EditCommand ]
-    end
-
-    class CategorizeCommand < ModifyCommand
-      include InstanceAbleCommand
-
-      @@noncompatible_commands = [ EditCommand ]
-    end
-
-
     class AddCommand < Command
       include InstanceAbleCommand
       include ExecuteableCommand
@@ -546,6 +523,29 @@ module Diary
         # TODO
       end
 
+    end
+
+
+    class ModifyCommand < Command
+    end
+
+    class EditCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ LimitCommand, FilterCommand,
+                                  ModifyCommand, AddCommand ]
+    end
+
+    class TagCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ EditCommand ]
+    end
+
+    class CategorizeCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ EditCommand ]
     end
 
 
