@@ -509,10 +509,10 @@ module Diary
       end
 
       def parse!
-        next_command until @argv.empty?
+        next_command! until @argv.empty?
       end
 
-      def next_command
+      def next_command!
         cmd = @argv.pop
         raise "Not a command: #{cmd}" if not Command.is_command? cmd
 
@@ -528,10 +528,10 @@ module Diary
           exit 1
         end
 
-        @commands << create_instance(commands.first)
+        @commands << create_instance!(commands.first)
       end
 
-      def create_instance(c)
+      def create_instance!(c)
         # decide which class this is, create the appropriate instance
         instance = nil # TODO
 
