@@ -123,16 +123,16 @@ class Entry
     @raw = content
   end
 
-  def self.from_path(cfg, day, path)
-    @time = self.time_from_path(cfg, day, path)
+  def self.from_path(path)
+    @time = self.time_from_path(path)
     @raw = File.read path
     @content = @raw.encode(Encoding::UTF_8)
   end
 
   protected
 
-  def self.time_from_path(cfg, day, path)
-    Time.parse(day.to_s + path.match(/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/).to_s)
+  def self.time_from_path(path)
+    Time.parse path.match(/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/).to_s
   end
 
 end
