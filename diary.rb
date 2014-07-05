@@ -501,6 +501,8 @@ module Diary
 
     class Parser
 
+      attr_reader :commands
+
       def initialize(argv)
         @argv = argv
         @commands = []
