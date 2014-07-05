@@ -110,6 +110,8 @@ module Diary
 
     end
 
+    module InstanceAbleCommand; end
+
     class Command
       attr_reader :keys, :attributes
 
@@ -144,6 +146,7 @@ module Diary
     end
 
     class CatCommand < QueryCommand
+      include InstanceAbleCommand
       include ExecuteableCommand
 
       @expected_attr_count = [0, 1]
@@ -208,6 +211,7 @@ module Diary
     end
 
     class LimitRangeCommand < LimitCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 1 ] # only one
       @keys = [ "--between", "-b" ]
@@ -271,6 +275,7 @@ module Diary
 
 
     class LimitInCommand < LimitRangeCommand
+      include InstanceAbleCommand
 
       # override
       def search_in? path
@@ -300,6 +305,7 @@ module Diary
     end
 
     class LimitYearCommand < LimitInCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -314,6 +320,7 @@ module Diary
     end
 
     class LimitMonthCommand < LimitInCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -328,6 +335,7 @@ module Diary
     end
 
     class LimitDayCommand < LimitInCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -408,6 +416,7 @@ module Diary
     end
 
     class TagFilterCommand < FilterCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 0 ]
 
@@ -425,6 +434,7 @@ module Diary
     end
 
     class CategoryFilterCommand < FilterCommand
+      include InstanceAbleCommand
 
       def initialize(name)
         @catname = name
@@ -444,16 +454,20 @@ module Diary
     end
 
     class EditCommand < ModifyCommand
+      include InstanceAbleCommand
     end
 
     class TagCommand < ModifyCommand
+      include InstanceAbleCommand
     end
 
     class CategorizeCommand < ModifyCommand
+      include InstanceAbleCommand
     end
 
 
     class AddCommand < Command
+      include InstanceAbleCommand
       include ExecuteableCommand
 
       def action(tree)
