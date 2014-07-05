@@ -132,7 +132,7 @@ class Entry
   protected
 
   def self.time_from_path(cfg, day, path)
-    Time.parse(day.to_s + path.match(cfg[:time_format]).to_s)
+    Time.parse(day.to_s + path.match(/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/).to_s)
   end
 
 end
