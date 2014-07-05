@@ -95,6 +95,21 @@ module Diary
 
     end
 
+    module ExtendedQueryCommand
+      # nothing yet
+      #
+      # shows that a command can be executed _before_ actually parsing the file
+      # tree
+    end
+
+    module ConfigReaderCommand
+
+      def config=(cfg)
+        @config = cfg
+      end
+
+    end
+
     class Command
       attr_reader :keys, :attributes
 
@@ -129,9 +144,59 @@ module Diary
     end
 
     class CatCommand < QueryCommand
+      include ExecuteableCommand
+
+      @expected_attr_count = [0, 1]
+      @keys = ["--cat", "-c"]
+
+      def action(tree)
+        tree.each do |entry|
+          cat entry
+          puts ""
+        end
+      end
+
+      protected
+
+      def cat(entry)
+        if @attributes.include? "raw"
+          puts entry.raw
+        else
+          puts "--- #{entry.time}"
+          puts entry.content
+        end
+      end
+
     end
 
     class CatLastCommand < CatCommand
+      include ExecuteableCommand
+      include ExtendedQueryCommand
+      include ConfigReaderCommand
+
+      def action(tree)
+        # `tree` should be empty, as this command is also a query command
+
+        year_path   = latest_year
+        month_path  = latest_sub_path year_path
+        day_path    = latest_sub_path month_path
+        entry_path  = latest_sub_path day_path
+
+        cat entry_path
+      end
+
+      protected
+
+      def latest_year
+        latest_sub_path @config[:content_dir]
+      end
+
+      def latest_sub_path(base)
+        entries = Dir.new(base).entries
+        ibase = entries.map(&:to_i)
+        base + "/" + entries[ibase.index(ibase.max)]
+      end
+
     end
 
     class LimitCommand < QueryCommand
