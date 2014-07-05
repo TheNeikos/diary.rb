@@ -672,7 +672,7 @@ module Diary
         instance = c.new()
 
         i = 0
-        until (instance.expected_attr_count || []).include? i do
+        until (instance.expected_attr_count || []).include?(i) || @argv.empty? do
           debug("Adding attribute to #{c} : #{@argv.first}")
           instance.add_attribute(@argv.pop)
           i += 1
