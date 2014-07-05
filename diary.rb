@@ -23,7 +23,7 @@ require 'find'
 require 'ostruct'
 require 'fileutils'
 require 'digest'
-require 'digest/sha512'
+require 'digest/sha2'
 
 module Diary
 
