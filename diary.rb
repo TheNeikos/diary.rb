@@ -176,44 +176,45 @@ module Diary
       #
       # 4) All years, its months and days and entries which are tagged
       def filter_tree tree
-        entries = filter_entries tree
-        days = filter_days tree
-        months = filter_months tree
-        years = filter_years tree
+        years = filter_years tree.years
+        months = filter_months(tree.years.select { |y| not years.include? y })
+        days = filter_days(months.select { |m| not months.include? m })
+        entries = filter_entries(days.select { |d| not days.include? d })
 
-        tree.entries.select do |entry|
-          [years, months, days, entries].map { |x| x.include? entry }.any?
-        end
+        # throw out the entries
+        tree.keep_entries entries
+
+        # then the days
+        tree.keep_days days
+
+        # then all other months
+        tree.keep_months months
+
+        # then all other years
+        tree.keep_years years
+
+        tree
       end
 
       protected
 
-      # take all lvls out and then filter the last level
-      def filter(tree, lvls)
-        filtered = tree.years
-        lvls.each { |lvl| filtered = filtered.map(&lvl).flatten }
-        filtered.select { |f| f.tags.include? @tagname }
-      end
+      def filter(ary, meth)
+        ary.map(&meth).flatten.select { |x| x.tags.include? @tagname }
 
-      # take the months, then the days, then the entries from the tree and
-      # filter
-      def filter_entries tree
-        filter(tree, [:months, :days, :entries])
-      end
-
-      # take the months from the tree, then the days from the tree and filter
-      def filter_days tree
-        filter(tree, [:months, :days])
-      end
-
-      # take the months from the tree and filter
-      def filter_months tree
-        filter(tree, [:months])
-      end
-
-      # return all years which are tagged with @tagname
       def filter_years tree
-        tree.years.select { |y| y.tags.include? @tagname }
+        filter([tree], :years)
+      end
+
+      def filter_months(years)
+        filter(years, :month)
+      end
+
+      def filter_days(months)
+        filter(months, :days)
+      end
+
+      def filter_entries(days)
+        filter(days, :entries)
       end
 
     end
