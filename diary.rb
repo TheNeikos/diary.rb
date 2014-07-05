@@ -29,6 +29,8 @@ class Config < Hash
     self[:root] = Dir.home + "/.diary"
     self[:cfg] = self[:root] + "/diary.conf"
 
+    self[:ext] = "txt"
+
     self.merge other_config
   end
 
