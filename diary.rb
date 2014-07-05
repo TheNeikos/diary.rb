@@ -125,6 +125,10 @@ class Day
     @entries = entries
   end
 
+  def day_index_str
+    @day_index.to_s.rjust(2, "0")
+  end
+
 end
 
 class Month
