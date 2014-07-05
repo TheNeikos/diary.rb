@@ -197,7 +197,7 @@ class Month
   end
 
   def name
-    Date::MONTHNAMES[@month_index].downcase
+    Date::MONTHNAMES[@index].downcase
   end
 
   def self.from_path(path)
