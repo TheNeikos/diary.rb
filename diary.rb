@@ -955,3 +955,11 @@ module Diary
   end
 
 end
+
+if __FILE__ == $0
+  cp = Diary::CommandParser::Parser.new(ARGV, {:verbose => true})
+  puts "Available: #{cp.available_commands.map(&:keys).flatten}"
+  cp.parse!
+
+  puts cp.commands
+end
