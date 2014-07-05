@@ -129,6 +129,18 @@ module Diary
     end
 
     class CatCommand < QueryCommand
+
+      @expected_attr_count = 0
+      @keys = ["--cat", "-c"]
+      @attributes = [] # for sure.
+
+      def action(tree)
+        tree.each do |entry|
+          puts "--- #{entry.time}"
+          puts entry.content
+          puts ""
+        end
+      end
     end
 
     class CatLastCommand < CatCommand
