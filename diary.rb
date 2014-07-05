@@ -125,8 +125,10 @@ module Diary
     class Command
       attr_reader :keys, :attributes, :expected_attr_count
 
-      @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
-      @attributes = []
+      def initialize
+        @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
+        @attributes = []
+      end
 
       def self.keys
         []
