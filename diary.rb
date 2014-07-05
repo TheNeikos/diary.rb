@@ -122,6 +122,15 @@ module Diary
     module ReaderCommand
     end
 
+    # If a command is only able to appear once, include this module
+    module Uniqueness
+
+      def uniqueness
+        true
+      end
+
+    end
+
     class Command
       attr_reader :keys, :attributes, :expected_attr_count
 
@@ -159,6 +168,7 @@ module Diary
 
     class ListCommand < QueryCommand
       include InstanceAbleCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
 
@@ -178,6 +188,7 @@ module Diary
     class CatCommand < QueryCommand
       include InstanceAbleCommand
       include ExecuteableCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
 
@@ -211,6 +222,7 @@ module Diary
       include ExecuteableCommand
       include ExtendedQueryCommand
       include ConfigReaderCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
 
@@ -494,6 +506,7 @@ module Diary
 
     class TagFilterCommand < FilterCommand
       include InstanceAbleCommand
+      include Uniqueness
 
       @expected_attr_count = (0..0)
 
@@ -516,6 +529,7 @@ module Diary
 
     class CategoryFilterCommand < FilterCommand
       include InstanceAbleCommand
+      include Uniqueness
 
       @expected_attr_count = (0..0)
 
@@ -540,6 +554,7 @@ module Diary
     class AddCommand < Command
       include InstanceAbleCommand
       include ExecuteableCommand
+      include Uniqueness
 
       @expected_attr_count = (0..0)
 
@@ -583,6 +598,7 @@ module Diary
 
     class EditCommand < ModifyCommand
       include InstanceAbleCommand
+      include Uniqueness
 
       @expected_attr_count = (0..0)
 
