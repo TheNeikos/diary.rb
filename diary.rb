@@ -595,6 +595,7 @@ module Diary
         cmd = @argv.pop
         raise "Not a command: #{cmd}" if not Command.is_command? cmd
 
+        debug "Searching for #{cmd}"
         commands = available_commands.select { |c| c.keys.include? cmd }
 
         if commands.length.zero?
@@ -607,6 +608,7 @@ module Diary
           exit 1
         end
 
+        debug "Creating instance for #{cmd}"
         @commands << create_instance!(commands.first)
       end
 
@@ -616,6 +618,7 @@ module Diary
 
         i = instance.expected_attr_count
         until i == 0 |n|
+          debug("Adding attribute to #{cmd} : #{@argv.first}")
           instance.add_attribute(@argv.pop)
           i -= 1
         end
