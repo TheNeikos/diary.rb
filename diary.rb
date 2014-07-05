@@ -555,6 +555,7 @@ module Diary
 
       def initialize(argv, config)
         @argv = argv
+        @config = config
         @commands = []
       end
 
