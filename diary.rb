@@ -93,6 +93,9 @@ module Diary
     class QueryCommand < Command
     end
 
+    class CatCommand < QueryCommand
+    end
+
     class LimitCommand < QueryCommand
     end
 
