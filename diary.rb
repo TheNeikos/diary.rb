@@ -110,22 +110,34 @@ module Diary
 
     end
 
+    module InstanceAbleCommand
+      attr_reader :noncompatible_commands
+
+      # All Not Compatible commands, can be superclass of own class
+      @@noncompatible_commands = []
+    end
+
+    # Commands which have an effect on the _reading_ of the tree should contain
+    # this module
+    module ReaderCommand
+    end
+
     class Command
-      attr_reader :keys, :attributes
+      attr_reader :keys, :attributes, :expected_attr_count
 
       @expected_attr_count = [] # all valid command attribute numbers, can be a range
-      @keys = []
       @attributes = []
 
-      def expected_attr_count
-        if self.class == Command
-          @expected_attr_count
-        else
-          super.expected_attr_count + @expected_attr_count
-        end
+      def self.keys
+        []
+      end
+
+      def keys
+        self.class.keys
       end
 
       def add_attribute a
+        @attributes ||= []
         @attributes << a
       end
 
@@ -143,11 +155,33 @@ module Diary
     class QueryCommand < Command
     end
 
+    class ListCommand < QueryCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ QueryCommand ]
+
+      def self.keys
+        ["--list"]
+      end
+
+      def action!(tree)
+        tree.all_entries.each do |entry|
+          puts "[#{entry.hash}] #{entry.time}"
+        end
+      end
+    end
+
     class CatCommand < QueryCommand
+      include InstanceAbleCommand
       include ExecuteableCommand
 
+      @@noncompatible_commands = [ QueryCommand ]
+
       @expected_attr_count = [0, 1]
-      @keys = ["--cat", "-c"]
+
+      def self.keys
+        ["--cat", "-c"]
+      end
 
       def action(tree)
         tree.each do |entry|
@@ -173,6 +207,12 @@ module Diary
       include ExecuteableCommand
       include ExtendedQueryCommand
       include ConfigReaderCommand
+
+      @@noncompatible_commands = [ QueryCommand ]
+
+      def self.keys
+        ["--last", "-l"]
+      end
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
@@ -208,9 +248,16 @@ module Diary
     end
 
     class LimitRangeCommand < LimitCommand
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      @@noncompatible_commands = [ LimitCommand ]
 
       @expected_attr_count = [ 1 ] # only one
-      @keys = [ "--between", "-b" ]
+
+      def self.keys
+        [ "--between", "-b" ]
+      end
 
       # override
       def add_attribute a
@@ -271,6 +318,14 @@ module Diary
 
 
     class LimitInCommand < LimitRangeCommand
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      @@noncompatible_commands = [ LimitCommand ]
+
+      def self.keys
+        ["--limit-in"]
+      end
 
       # override
       def search_in? path
@@ -300,10 +355,18 @@ module Diary
     end
 
     class LimitYearCommand < LimitInCommand
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
+
       @attributes = []
+
+      def self.keys
+        [ "--year" ]
+      end
 
       def search_in? path
         y = @attribute.first
@@ -314,10 +377,17 @@ module Diary
     end
 
     class LimitMonthCommand < LimitInCommand
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
       @attributes = []
+
+      def self.keys
+        [ "--month" ]
+      end
 
       def search_in? path
         m = @attribute.first
@@ -328,10 +398,17 @@ module Diary
     end
 
     class LimitDayCommand < LimitInCommand
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @keys = [ "--year" ]
       @attributes = []
+
+      def self.keys
+        [ "--day" ]
+      end
 
       def search_in? path
         d = @attribute.first
@@ -408,8 +485,13 @@ module Diary
     end
 
     class TagFilterCommand < FilterCommand
+      include InstanceAbleCommand
 
       @expected_attr_count = [ 0 ]
+
+      def self.keys
+        []
+      end
 
       def initialize(name)
         @tagname = name
@@ -425,6 +507,11 @@ module Diary
     end
 
     class CategoryFilterCommand < FilterCommand
+      include InstanceAbleCommand
+
+      def self.keys
+        ["--in-category", "-in-c"]
+      end
 
       def initialize(name)
         @catname = name
@@ -440,21 +527,15 @@ module Diary
     end
 
 
-    class ModifyCommand < Command
-    end
-
-    class EditCommand < ModifyCommand
-    end
-
-    class TagCommand < ModifyCommand
-    end
-
-    class CategorizeCommand < ModifyCommand
-    end
-
-
     class AddCommand < Command
+      include InstanceAbleCommand
       include ExecuteableCommand
+
+      def self.keys
+        ["--add"]
+      end
+
+      @@noncompatible_commands = [ Command ] # either add or something else.
 
       def action(tree)
         dir = generate_dir_path
@@ -482,6 +563,194 @@ module Diary
         # TODO
       end
 
+    end
+
+
+    class ModifyCommand < Command
+    end
+
+    class EditCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ LimitCommand, FilterCommand,
+                                  ModifyCommand, AddCommand ]
+
+      def self.keys
+        ["--edit"]
+      end
+
+    end
+
+    class TagCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ EditCommand ]
+
+      def self.keys
+        ["--tag"]
+      end
+
+    end
+
+    class CategorizeCommand < ModifyCommand
+      include InstanceAbleCommand
+
+      @@noncompatible_commands = [ EditCommand ]
+
+      def self.keys
+        ["--category"]
+      end
+
+    end
+
+
+    class Parser
+
+      attr_reader :commands
+
+      def initialize(argv, config)
+        @argv = argv
+        @config = config
+        @commands = []
+      end
+
+      def parse!
+        next_command! until @argv.empty?
+      end
+
+      def available_commands
+        [
+          Command,
+          QueryCommand,
+          CatCommand,
+          CatLastCommand,
+          LimitCommand,
+          LimitRangeCommand,
+          LimitInCommand,
+          LimitYearCommand,
+          LimitMonthCommand,
+          LimitDayCommand,
+          FilterCommand,
+          TagFilterCommand,
+          CategoryFilterCommand,
+          ModifyCommand,
+          EditCommand,
+          TagCommand,
+          CategorizeCommand,
+          AddCommand
+        ].select { |s| s.include? InstanceAbleCommand }
+      end
+
+      protected
+
+      def debug(str)
+        puts str if @config[:verbose]
+      end
+
+      def next_command!
+        cmd = @argv.pop
+        raise "Not a command: #{cmd}" if not Command.is_command? cmd
+
+        debug "Searching for #{cmd}"
+        commands = available_commands.select { |c| c.keys.include? cmd }
+
+        if commands.length.zero?
+          puts "Command not found: #{cmd}"
+          exit 1
+        end
+
+        if commands.length > 1
+          puts "Command seems to be not unique: #{cmd}"
+          exit 1
+        end
+
+        debug "Creating instance for #{cmd}"
+        @commands << create_instance!(commands.first)
+      end
+
+      def create_instance!(c)
+        instance = c.new()
+
+        i = 0
+        until (instance.expected_attr_count || []).include?(i) || @argv.empty? do
+          debug("Adding attribute to #{c} : #{@argv.first}")
+          instance.add_attribute(@argv.pop)
+          i += 1
+        end
+
+        raise "Possibly not enough arguments for #{c}" if not i.zero?
+        instance
+      end
+
+    end
+
+  end
+
+  class Executer
+
+    def initalize(config, commands)
+      @config = config
+      @commands = commands
+      raise "Invalid command state..." if not valid?
+    end
+
+    def execute!
+      catlast = query_commands.select { |c| c.is_a? CatLastCommand }
+      if catlast
+        catlast.action()
+        return
+      end
+
+      tree = Tree.from_path(@config[:content_dir], reader_commands)
+      tree.filter!(filter_commands)
+
+      run_queries(tree)
+    end
+
+    protected
+
+    def run_queries(tree)
+      if query_commands.empty?
+        ListCommand.new(tree).action!
+      else
+        query_commands.each do |qcmd|
+          cmd.action!(tree)
+        end
+      end
+    end
+
+    def valid?
+      commands_compatible?
+    end
+
+    def commands_compatible?
+      @commands.each do |command|
+        @commands.each do |other|
+          return false if command.class.noncompatible_commands.include? other
+        end
+      end
+
+      return true
+    end
+
+    def reader_commands
+      only_commands ReaderCommand
+    end
+
+    def filter_commands
+      only_commands FilterCommand
+    end
+
+    def limit_commands
+      only_commands LimitCommand
+    end
+
+    def query_commands
+      only_commands QueryCommand
+    end
+
+    def only klass
+      @commands.select { |c| c.is_a? klass }
     end
 
   end
@@ -685,4 +954,12 @@ module Diary
 
   end
 
+end
+
+if __FILE__ == $0
+  cp = Diary::CommandParser::Parser.new(ARGV, {:verbose => true})
+  puts "Available: #{cp.available_commands.map(&:keys).flatten}"
+  cp.parse!
+
+  puts cp.commands
 end
