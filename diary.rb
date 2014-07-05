@@ -22,6 +22,8 @@ require 'time'
 require 'find'
 require 'ostruct'
 require 'fileutils'
+require 'digest'
+require 'digest/sha512'
 
 module Diary
 
@@ -126,7 +128,7 @@ module Diary
     include Indexable
 
     attr_accessor :time
-    attr_reader :content, :raw
+    attr_reader :content, :raw, :hash
 
     def initialize(time, content)
       @time = time
@@ -139,6 +141,10 @@ module Diary
       raw = File.read path
 
       Entry.new(time, raw)
+    end
+
+    def hash
+      @hash ||= Digest::SHA512.hexdigest @raw
     end
 
     protected
