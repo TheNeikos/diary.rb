@@ -86,10 +86,10 @@ module Diary
   module CommandParser
 
     class Command
-      attr_reader :key, :attributes
+      attr_reader :keys, :attributes
 
       @expected_attr_count = 0
-      @key = nil
+      @keys = []
       @attributes = []
 
       def expected_attr_count
