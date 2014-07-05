@@ -98,14 +98,6 @@ module Diary
         end
       end
 
-      def from_key k
-        raise NoMethodException.new("Not implemented")
-      end
-
-      def is_for_key? k
-        raise NoMethodException.new("Not implemented")
-      end
-
       def self.is_command? str
         ["-", "+"].map { |e| str.start_with? e }.any?
       end
