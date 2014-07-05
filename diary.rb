@@ -93,7 +93,7 @@ module Diary
 
     def self.subs_from_path(path, gen_class, &block)
       Dir.new(path).entries.select(&block).map do |entry|
-        gen_class.from_path(path + "/" + entry)
+        gen_class.from_path(path + "/" + entry, true)
       end
     end
 
@@ -164,9 +164,11 @@ module Diary
       @entries.each(&block)
     end
 
-    def self.from_path(path)
+    def self.from_path(path, create_subs = false)
       @index = self.index_from_path(path, /[0-9]{2,2}$/)
-      @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
+      if create_subs
+        @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
+      end
     end
 
   end
@@ -191,9 +193,11 @@ module Diary
       Date::MONTHNAMES[@index].downcase
     end
 
-    def self.from_path(path)
+    def self.from_path(path, create_subs = false)
       @index = self.index_from_path(path, /[0-9]{2,2}$/)
-      @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
+      if create_subs
+        @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
+      end
     end
 
   end
@@ -213,10 +217,10 @@ module Diary
       @months.each(&block)
     end
 
-    def self.from_path(path)
+    def self.from_path(path, create_subs = false)
       @path = path
       @year = self.year_from_path path
-      @months = self.months_under path
+      @months = self.months_under(path) if create_subs
     end
 
     protected
