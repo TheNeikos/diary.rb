@@ -200,6 +200,7 @@ module Diary
 
       def filter(ary, meth)
         ary.map(&meth).flatten.select { |x| x.tags.include? @tagname }
+      end
 
       def filter_years tree
         filter([tree], :years)
