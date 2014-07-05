@@ -81,8 +81,17 @@ module ConfigReader
 
 end
 
+module CreateAbleFromPath
+
+  def self.from_path(path)
+    raise NoMethodException.new("Not implemented")
+  end
+
+end
+
 class Entry
   include ConfigReader
+  include CreateAbleFromPath
 
   attr_accessor :time
   attr_reader :content, :raw
@@ -97,6 +106,7 @@ end
 
 class Day
   include ConfigReader
+  include CreateAbleFromPath
 
   attr_accessor :entries
 
@@ -108,6 +118,7 @@ end
 
 class Month
   include ConfigReader
+  include CreateAbleFromPath
 
   attr_accessor :days
   attr_reader :month_index
@@ -125,6 +136,7 @@ end
 
 class Year
   include ConfigReader
+  include CreateAbleFromPath
 
   attr_accessor :months
 
