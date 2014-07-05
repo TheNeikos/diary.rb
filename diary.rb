@@ -389,6 +389,34 @@ module Diary
 
 
     class AddCommand < Command
+      include ExecuteableCommand
+
+      def action(tree)
+        dir = generate_dir_path
+        ensure_dir_exists dir
+        path = generate_full_path dir
+        touch path
+        call_editor path
+      end
+
+      protected
+
+      def generate_dir_path
+        Time.now.strftime "%Y/%m/%d"
+      end
+
+      def generate_full_path(dirpath)
+        dirpath + Time.now.strftime("%H-%m-%S")
+      end
+
+      def touch path
+        FileUtils.touch path
+      end
+
+      def call_editor path
+        # TODO
+      end
+
     end
 
   end
