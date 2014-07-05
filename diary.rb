@@ -132,6 +132,9 @@ module Diary
     class ModifyCommand < Command
     end
 
+    class EditCommand < ModifyCommand
+    end
+
     class TagCommand < ModifyCommand
     end
 
