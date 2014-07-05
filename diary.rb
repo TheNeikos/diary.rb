@@ -583,7 +583,7 @@ module Diary
           TagCommand,
           CategorizeCommand,
           AddCommand
-        ].select { |s| s.is_a? InstanceAbleCommand }
+        ].select { |s| s.include? InstanceAbleCommand }
       end
 
       protected
