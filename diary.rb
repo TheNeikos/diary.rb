@@ -136,15 +136,22 @@ module Diary
 
       def action(tree)
         tree.each do |entry|
-          if @attributes.include? "raw"
-            puts entry.raw
-          else
-            puts "--- #{entry.time}"
-            puts entry.content
-          end
+          cat entry
           puts ""
         end
       end
+
+      protected
+
+      def cat(entry)
+        if @attributes.include? "raw"
+          puts entry.raw
+        else
+          puts "--- #{entry.time}"
+          puts entry.content
+        end
+      end
+
     end
 
     class CatLastCommand < CatCommand
