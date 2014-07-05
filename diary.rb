@@ -606,12 +606,27 @@ module Diary
 
     def initalize(commands)
       @commands = commands
+      raise "Invalid command state..." if not valid?
     end
 
     def execute!
     end
 
     protected
+
+    def valid?
+      commands_compatible?
+    end
+
+    def commands_compatible?
+      @commands.each do |command|
+        @commands.each do |other|
+          return false if command.class.noncompatible_commands.include? other
+        end
+      end
+
+      return true
+    end
 
     def filter_commands
       only_commands FilterCommand
