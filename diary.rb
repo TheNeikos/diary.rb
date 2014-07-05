@@ -114,7 +114,7 @@ module Diary
       attr_reader :compatible_commands, :noncompatible_commands
 
       # All Not Compatible commands, can be superclass of own class
-      @noncompatible_commands = []
+      @@noncompatible_commands = []
     end
 
     class Command
@@ -154,7 +154,7 @@ module Diary
       include InstanceAbleCommand
       include ExecuteableCommand
 
-      @noncompatible_commands = [ QueryCommand ]
+      @@noncompatible_commands = [ QueryCommand ]
 
       @expected_attr_count = [0, 1]
       @keys = ["--cat", "-c"]
@@ -184,7 +184,7 @@ module Diary
       include ExtendedQueryCommand
       include ConfigReaderCommand
 
-      @noncompatible_commands = [ QueryCommand ]
+      @@noncompatible_commands = [ QueryCommand ]
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
@@ -222,7 +222,7 @@ module Diary
     class LimitRangeCommand < LimitCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitCommand ]
+      @@noncompatible_commands = [ LimitCommand ]
 
       @expected_attr_count = [ 1 ] # only one
       @keys = [ "--between", "-b" ]
@@ -288,7 +288,7 @@ module Diary
     class LimitInCommand < LimitRangeCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitCommand ]
+      @@noncompatible_commands = [ LimitCommand ]
 
       # override
       def search_in? path
@@ -320,7 +320,7 @@ module Diary
     class LimitYearCommand < LimitInCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -337,7 +337,7 @@ module Diary
     class LimitMonthCommand < LimitInCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -354,7 +354,7 @@ module Diary
     class LimitDayCommand < LimitInCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
       @keys = [ "--year" ]
@@ -475,20 +475,20 @@ module Diary
     class EditCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ LimitCommand, FilterCommand,
+      @@noncompatible_commands = [ LimitCommand, FilterCommand,
                                   ModifyCommand, AddCommand ]
     end
 
     class TagCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ EditCommand ]
+      @@noncompatible_commands = [ EditCommand ]
     end
 
     class CategorizeCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @noncompatible_commands = [ EditCommand ]
+      @@noncompatible_commands = [ EditCommand ]
     end
 
 
@@ -496,7 +496,7 @@ module Diary
       include InstanceAbleCommand
       include ExecuteableCommand
 
-      @noncompatible_commands = [ Command ] # either add or something else.
+      @@noncompatible_commands = [ Command ] # either add or something else.
 
       def action(tree)
         dir = generate_dir_path
