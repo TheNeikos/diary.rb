@@ -263,6 +263,17 @@ module Diary
     end
 
     class LimitDayCommand < LimitInCommand
+
+      @expected_attr_count = [ 1 ]
+      @keys = [ "--year" ]
+      @attributes = []
+
+      def search_in? path
+        d = @attribute.first
+
+        path.match(/[0-9]{4,4}\/[0-9]{2,2}\/#{d}\//)
+      end
+
     end
 
 
