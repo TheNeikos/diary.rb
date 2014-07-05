@@ -31,7 +31,7 @@ module Diary
     def initialize(other_config_path = false)
       self[:root] = Dir.home + "/.diary"
       self[:content_dir] = self[:root] + "/content"
-      self[:cfg] = other_config_path || self[:root] + "/diary.conf"
+      self[:configfile] = other_config_path || self[:root] + "/diary.conf"
 
       self[:ext] = "txt"
 
@@ -49,7 +49,7 @@ module Diary
     protected
 
     def non_default_config
-      # TODO: read self[:cfg] file to hash and return
+      # TODO: read self[:configfile] file to hash and return
     end
 
   end
