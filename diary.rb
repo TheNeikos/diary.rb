@@ -154,6 +154,13 @@ module Diary
       end
 
       def search_in? path
+        fmt = ""
+        fmt << "%Y/" if @start_year  || @end_year
+        fmt << "%m/" if @start_month || @end_month
+        fmt << "%d/" if @start_day   || @end_day
+
+        d = Date.strptime(path, fmt)
+        (@start_date..@end_date).include? d
       end
 
       protected
