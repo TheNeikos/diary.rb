@@ -88,6 +88,16 @@ module Diary
     class Command
       attr_reader :key, :attributes
 
+      @expected_attr_count = 0
+
+      def expected_attr_count
+        if self.class == Command
+          @expected_attr_count
+        else
+          super.expected_attr_count + @expected_attr_count
+        end
+      end
+
       def from_key k
         raise NoMethodException.new("Not implemented")
       end
