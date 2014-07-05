@@ -205,7 +205,33 @@ module Diary
     end
 
 
-    class LimitInCommand < LimitCommand
+    class LimitInCommand < LimitRangeCommand
+
+      # override
+      def search_in? path
+        if @start_year and not path.include? @start_year.to_s
+          return false
+        end
+
+        if @start_month and not path.include? "#{@start_year}/#{@start_month}"
+          return false
+        end
+
+        if @start_day and not path.include? "#{@start_year}/#{@start_month}/#{@start_day}"
+          return false
+        end
+
+        return true
+      end
+
+      protected
+
+      # override
+      def parse_attribute a
+        # we only parse the start date here, as we only have one date.
+        parse_start_date a
+      end
+
     end
 
     class LimitYearCommand < LimitInCommand
