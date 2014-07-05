@@ -182,7 +182,7 @@ module Diary
         m = parts.pop.to_i if nparts <= 2
         y = parts.pop.to_i if nparts <= 1
 
-        [y, m, d]
+        [y, m || 1, d || 1]
       end
 
     end
