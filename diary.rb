@@ -137,6 +137,10 @@ class Month
     @days = days
   end
 
+  def month_index_str
+    @month_index.to_s.rjust(2, "0")
+  end
+
   def name
     Date::MONTHNAMES[@month_index].downcase
   end
