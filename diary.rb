@@ -116,7 +116,7 @@ module Diary
       attr_reader :keys, :attributes
 
       @expected_attr_count = [] # all valid command attribute numbers, can be a range
-      @keys = []
+      @@keys = []
       @attributes = []
 
       def expected_attr_count
