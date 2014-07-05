@@ -135,6 +135,11 @@ module Diary
     end
 
     class LimitCommand < QueryCommand
+
+      def search_in?(path)
+        true
+      end
+
     end
 
     class LimitRangeCommand < LimitCommand
