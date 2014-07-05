@@ -102,6 +102,14 @@ module Diary
       # tree
     end
 
+    module ConfigReaderCommand
+
+      def config=(cfg)
+        @config = cfg
+      end
+
+    end
+
     class Command
       attr_reader :keys, :attributes
 
