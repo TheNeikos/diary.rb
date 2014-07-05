@@ -167,6 +167,10 @@ module Diary
 
       @@noncompatible_commands = [ QueryCommand ]
 
+      def self.keys
+        ["--list"]
+      end
+
       def action!(tree)
         tree.all_entries.each do |entry|
           puts "[#{entry.hash}] #{entry.time}"
@@ -212,6 +216,10 @@ module Diary
       include ConfigReaderCommand
 
       @@noncompatible_commands = [ QueryCommand ]
+
+      def self.keys
+        ["--last", "-l"]
+      end
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
@@ -322,6 +330,10 @@ module Diary
 
       @@noncompatible_commands = [ LimitCommand ]
 
+      def self.keys
+        ["--limit-in"]
+      end
+
       # override
       def search_in? path
         if @start_year and not path.include? @start_year.to_s
@@ -381,7 +393,7 @@ module Diary
       @attributes = []
 
       def self.keys
-        [ "--year" ]
+        [ "--month" ]
       end
 
       def search_in? path
@@ -402,7 +414,7 @@ module Diary
       @attributes = []
 
       def self.keys
-        [ "--year" ]
+        [ "--day" ]
       end
 
       def search_in? path
@@ -484,6 +496,10 @@ module Diary
 
       @expected_attr_count = [ 0 ]
 
+      def self.keys
+        []
+      end
+
       def initialize(name)
         @tagname = name
       end
@@ -499,6 +515,10 @@ module Diary
 
     class CategoryFilterCommand < FilterCommand
       include InstanceAbleCommand
+
+      def self.keys
+        ["--in-category", "-in-c"]
+      end
 
       def initialize(name)
         @catname = name
@@ -517,6 +537,10 @@ module Diary
     class AddCommand < Command
       include InstanceAbleCommand
       include ExecuteableCommand
+
+      def self.keys
+        ["--add"]
+      end
 
       @@noncompatible_commands = [ Command ] # either add or something else.
 
@@ -557,18 +581,33 @@ module Diary
 
       @@noncompatible_commands = [ LimitCommand, FilterCommand,
                                   ModifyCommand, AddCommand ]
+
+      def self.keys
+        ["--edit"]
+      end
+
     end
 
     class TagCommand < ModifyCommand
       include InstanceAbleCommand
 
       @@noncompatible_commands = [ EditCommand ]
+
+      def self.keys
+        ["--tag"]
+      end
+
     end
 
     class CategorizeCommand < ModifyCommand
       include InstanceAbleCommand
 
       @@noncompatible_commands = [ EditCommand ]
+
+      def self.keys
+        ["--category"]
+      end
+
     end
 
 
