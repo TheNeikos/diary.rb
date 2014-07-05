@@ -25,13 +25,13 @@ require 'fileutils'
 class Config < Hash
 
   # defaults
-  def initialize(other_config = Hash.new)
+  def initialize(other_config_path = false)
     self[:root] = Dir.home + "/.diary"
-    self[:cfg] = self[:root] + "/diary.conf"
+    self[:cfg] = other_config_path || self[:root] + "/diary.conf"
 
     self[:ext] = "txt"
 
-    self.merge other_config
+    self.merge non_default_config
   end
 
   def []=(k, v)
@@ -40,6 +40,12 @@ class Config < Hash
 
   def [](k)
     super[k.to_sym]
+  end
+
+  protected
+
+  def non_default_config
+    # TODO: read self[:cfg] file to hash and return
   end
 
 end
