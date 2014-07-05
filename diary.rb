@@ -254,7 +254,7 @@ module Diary
 
     def self.from_path(path)
       time = self.time_from_path(path)
-      raw = transform_to_symbol_hash YAML.read_file(path)
+      raw = YAML.read_file(path).transform_to_symbol_hash
       Entry.new(time, raw)
     end
 
