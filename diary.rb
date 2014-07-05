@@ -172,30 +172,29 @@ module Diary
     class CatLastCommand < CatCommand
       include ExecuteableCommand
       include ExtendedQueryCommand
+      include ConfigReaderCommand
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
 
-        year = latest_year Date.today.year
-        month = latest_month year
-        day = latest_day year, month
-        entry = latest_entry year, month, day
+        year_path   = latest_year
+        month_path  = latest_sub_path year_path
+        day_path    = latest_sub_path month_path
+        entry_path  = latest_sub_path day_path
 
-        cat entry
+        cat entry_path
       end
 
       protected
 
-      def latest_year(thisyear)
+      def latest_year
+        latest_sub_path @config[:content_dir]
       end
 
-      def latest_month(year)
-      end
-
-      def latest_day(year, month)
-      end
-
-      def latest_entry(year, month, day)
+      def latest_sub_path(base)
+        entries = Dir.new(base).entries
+        ibase = entries.map(&:to_i)
+        base + "/" + entries[ibase.index(ibase.max)]
       end
 
     end
