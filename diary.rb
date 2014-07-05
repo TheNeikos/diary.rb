@@ -668,8 +668,7 @@ module Diary
       end
 
       def create_instance!(c)
-        # decide which class this is, create the appropriate instance
-        instance = nil # TODO
+        instance = c.new()
 
         i = instance.expected_attr_count
         until i == 0 |n|
