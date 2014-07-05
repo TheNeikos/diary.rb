@@ -85,8 +85,41 @@ module Diary
 
   module CommandParser
 
+    module ExecuteableCommand
+
+      def action(tree)
+        raise NoMethodException.new "Not implemented"
+      end
+
+    end
+
     class Command
-      attr_reader :key, :attributes
+      attr_reader :keys, :attributes
+
+      @expected_attr_count = [] # all valid command attribute numbers, can be a range
+      @keys = []
+      @attributes = []
+
+      def expected_attr_count
+        if self.class == Command
+          @expected_attr_count
+        else
+          super.expected_attr_count + @expected_attr_count
+        end
+      end
+
+      def add_attribute a
+        @attributes << a
+      end
+
+      def self.is_command? str
+        ["-", "+"].map { |e| str.start_with? e }.any?
+      end
+
+      def self.assign_cmd? str
+        str.include? "="
+      end
+
     end
 
 
