@@ -160,6 +160,8 @@ module Diary
 
       @@noncompatible_commands = [ QueryCommand ]
 
+      @expected_attr_count = (0..0)
+
       def self.keys
         ["--list"]
       end
@@ -209,6 +211,8 @@ module Diary
       include ConfigReaderCommand
 
       @@noncompatible_commands = [ QueryCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--last", "-l"]
@@ -322,6 +326,8 @@ module Diary
       include ReaderCommand
 
       @@noncompatible_commands = [ LimitCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--limit-in"]
@@ -509,6 +515,8 @@ module Diary
     class CategoryFilterCommand < FilterCommand
       include InstanceAbleCommand
 
+      @expected_attr_count = (0..0)
+
       def self.keys
         ["--in-category", "-in-c"]
       end
@@ -530,6 +538,8 @@ module Diary
     class AddCommand < Command
       include InstanceAbleCommand
       include ExecuteableCommand
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--add"]
@@ -572,6 +582,8 @@ module Diary
     class EditCommand < ModifyCommand
       include InstanceAbleCommand
 
+      @expected_attr_count = (0..0)
+
       @@noncompatible_commands = [ LimitCommand, FilterCommand,
                                   ModifyCommand, AddCommand ]
 
@@ -586,6 +598,8 @@ module Diary
 
       @@noncompatible_commands = [ EditCommand ]
 
+      @expected_attr_count = (0..0)
+
       def self.keys
         ["--tag"]
       end
@@ -596,6 +610,8 @@ module Diary
       include InstanceAbleCommand
 
       @@noncompatible_commands = [ EditCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--category"]
