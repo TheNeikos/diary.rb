@@ -87,6 +87,23 @@ module Diary
 
     class Command
       attr_reader :key, :attributes
+
+      def from_key k
+        raise NoMethodException.new("Not implemented")
+      end
+
+      def is_for_key? k
+        raise NoMethodException.new("Not implemented")
+      end
+
+      def self.is_command? str
+        ["-", "+"].map { |e| str.start_with? e }.any?
+      end
+
+      def self.assign_cmd? str
+        str.include? "="
+      end
+
     end
 
 
