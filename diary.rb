@@ -123,18 +123,10 @@ module Diary
     end
 
     class Command
-      attr_reader :keys, :attributes
+      attr_reader :keys, :attributes, :expected_attr_count
 
       @expected_attr_count = [] # all valid command attribute numbers, can be a range
       @attributes = []
-
-      def expected_attr_count
-        if self.class == Command
-          @expected_attr_count
-        else
-          super.expected_attr_count + @expected_attr_count
-        end
-      end
 
       def self.keys
         []
