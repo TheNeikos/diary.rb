@@ -32,6 +32,7 @@ module Diary
       self[:root] = Dir.home + "/.diary"
       self[:content_dir] = self[:root] + "/content"
       self[:configfile] = other_config_path || self[:root] + "/diary.conf"
+      self[:editor] = "/usr/bin/vi"
 
       self[:ext] = "txt"
 
