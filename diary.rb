@@ -98,9 +98,20 @@ module CreateAbleFromPath
 
 end
 
+module Indexable
+
+  attr_reader :index
+
+  def index_str(n = 2)
+    @index.to_s.rjust(n, "0")
+  end
+
+end
+
 class Entry
   include ConfigReader
   include CreateAbleFromPath
+  include Indexable
 
   attr_accessor :time
   attr_reader :content, :raw
@@ -116,17 +127,13 @@ end
 class Day
   include ConfigReader
   include CreateAbleFromPath
+  include Indexable
 
   attr_accessor :entries
-  attr_reader :day_index
 
   def initialize(entries, day_index = false)
-    @day_index = day_index || Date.today.day
+    @index = day_index || Date.today.day
     @entries = entries
-  end
-
-  def day_index_str
-    @day_index.to_s.rjust(2, "0")
   end
 
 end
@@ -134,17 +141,13 @@ end
 class Month
   include ConfigReader
   include CreateAbleFromPath
+  include Indexable
 
   attr_accessor :days
-  attr_reader :month_index
 
   def initialize(days, month_index = false)
-    @month_index = month_index || Date.today.month
+    @index = month_index || Date.today.month
     @days = days
-  end
-
-  def month_index_str
-    @month_index.to_s.rjust(2, "0")
   end
 
   def name
@@ -152,7 +155,7 @@ class Month
   end
 
   def self.from_path(path)
-    @month_index = self.index_from_path(path)
+    @index = self.index_from_path(path)
     @days = self.days_from_path(path)
   end
 
