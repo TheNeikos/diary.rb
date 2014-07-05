@@ -137,6 +137,7 @@ module Diary
       end
 
       def add_attribute a
+        @attributes ||= []
         @attributes << a
       end
 
