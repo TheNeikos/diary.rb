@@ -143,6 +143,48 @@ module Diary
     end
 
     class LimitRangeCommand < LimitCommand
+
+      @expected_attr_count = [ 1 ] # only one
+      @keys = [ "--between", "-b" ]
+
+      # override
+      def add_attribute a
+        super.add_attribute a
+        parse_attribute a
+      end
+
+      def search_in? path
+      end
+
+      protected
+
+      def parse_attribute a
+        start_date = a.split("..").first
+        end_date = a.split("..").last
+
+        @start_year, @start_month, @start_day = parse_date start_date
+        @end_year, @end_month, @end_day = parse_date end_date
+      end
+
+      def parse_date str
+        y, m, d = [nil, nil, nil]
+
+        parts = str.split("-")
+        nparts = parts.length
+
+        if nparts > 3 or nparts < 1
+          # something wents wrong
+          puts "Huh, date parsing fails"
+          raise "Date parsing went wrong, your date has not [1,2,3] parts"
+        end
+
+        d = parts.pop.to_i if nparts == 3
+        m = parts.pop.to_i if nparts <= 2
+        y = parts.pop.to_i if nparts <= 1
+
+        [y, m, d]
+      end
+
     end
 
 
