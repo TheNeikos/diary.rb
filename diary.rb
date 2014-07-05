@@ -553,7 +553,7 @@ module Diary
 
       attr_reader :commands
 
-      def initialize(argv)
+      def initialize(argv, config)
         @argv = argv
         @commands = []
       end
@@ -586,6 +586,10 @@ module Diary
       end
 
       protected
+
+      def debug(str)
+        puts str if @config[:verbose]
+      end
 
       def next_command!
         cmd = @argv.pop
