@@ -691,7 +691,7 @@ module Diary
         instance = c.new()
 
         i = 0
-        while instance.expected_attr_count.include?(i) || (not @argv.empty?) do
+        while i < instance.expected_attr_count.max || (not @argv.empty?) do
           debug("Adding attribute to #{c} : #{@argv.first}")
           instance.add_attribute(@argv.pop)
           i += 1
