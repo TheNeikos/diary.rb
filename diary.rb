@@ -9,7 +9,7 @@
 #
 #   http://sourceforge.net/projects/diary/
 #
-# With attempt to be compatible, but providing more functionality.
+# This version won't be compatible anymore.
 #
 # All loaded libraries should be shipped with ruby itself. So there is no need
 # to install any gem to run this script.
@@ -18,229 +18,220 @@
 require 'yaml'
 require 'optparse'
 require 'date'
+require 'time'
 require 'find'
 require 'ostruct'
 require 'fileutils'
 
-class Date
-
-  def diarypath
-    self.strftime "%Y/%m"
-  end
-
-  def diaryfilename
-    self.strftime "/%d.#{Diary::Config::FILE_EXT}"
-  end
-
-end
-
 module Diary
 
-  module Commands # enumeration foo
+  class Config < Hash
 
-    class Command # kindof abstract
+    # defaults
+    def initialize(other_config_path = false)
+      self[:root] = Dir.home + "/.diary"
+      self[:content_dir] = self[:root] + "/content"
+      self[:configfile] = other_config_path || self[:root] + "/diary.conf"
+      self[:editor] = "/usr/bin/vi"
 
-      attr_reader :args
+      self[:ext] = "txt"
 
-      def initialize args
-        @args = args
-      end
-
-      def run
-        raise "Not implemented"
-      end
-
-      protected
-
-      def diarypath(ext = "")
-        Diary::Config::PAGEDIR + "/" + Date.today.diarypath + ext
-      end
-
+      self.merge non_default_config
     end
 
-    class EditCommand < Command
-
-      def run
-        filepath = diarypath Diary::Utils.mkdir_p filepath
-
-        file = filepath + Date.today.diaryfilename
-        Diary::Utils.ensure_exists file, Diary::Config::DEFAULT_CONTENT
-
-        Diary::Utils.editor file
-      end
-
+    def []=(k, v)
+      super[k.to_sym] = v
     end
 
-    class HelpCommand < Command
-
-      def run
-        puts Diary::Options.help
-        exit 1
-      end
-
+    def [](k)
+      super[k.to_sym]
     end
 
-    class CatCommand < Command
+    protected
 
-      def run
-        # TODO: Works only for today. Not compatible
-        file = diarypath Date.today.diaryfilename
-
-        puts File.read(file)
-      end
-
-    end
-
-    class ViewCommand < Command
-
-      def run
-        # TODO: Works only for today. Not compatible
-        file = diarypath Date.today.diaryfilename
-
-        Diary::Utils.editor file
-      end
-
-    end
-
-    class GrepCommand < Command
-
-      def run
-        grepargs = (@args || []).join ' '
-        files = Diary::Utils.all_diary_files
-        Diary::Utils.exec "grep " + ([grepargs] + files).join(' ')
-      end
-
-    end
-
-    EDIT = EditCommand
-    HELP = HelpCommand
-    CAT  = CatCommand
-    VIEW = ViewCommand
-    GREP = GrepCommand
-
-  end
-
-  module Config
-
-    DIARYDIR = ENV['HOME'] + "/diary"
-
-    PAGEDIR = DIARYDIR + "/pages"
-
-    CONFFILE = DIARYDIR + "/diaryrc"
-
-    FILE_EXT = "cal"
-
-    EDITOR = ENV['EDITOR'] || "/usr/bin/vim"
-    EDIT_OPTS = "-c :$ " unless ENV['EDITOR']
-
-    ENTRY_TIMEFMT = "%A, %m.%d.%Y"
-    DEFAULT_CONTENT = " " * 15 + Date.today.strftime(ENTRY_TIMEFMT) + "\n"
-
-    DEFAULT_CMD = Diary::Commands::EDIT
-
-  end
-
-  module Options
-    extend self
-
-    def parse!(argv)
-      options = OpenStruct.new
-      options.verbose       = false
-      options.command       = Diary::Config::DEFAULT_CMD
-      options.command_args  = nil
-
-      options.command       = decide_command ARGV.shift
-      options.command_args  = ARGV.clone
-
-      options
-    end
-
-    def decide_command c
-      if helper_command c
-        help
-        exit 1
-      end
-      case c
-      when "cat"  then Diary::Commands::CAT
-      when "view" then Diary::Commands::VIEW
-      when "grep" then Diary::Commands::GREP
-      else # when "edit"
-        Diary::Commands::EDIT
-      end
-    end
-
-    def helper_command c
-      %w(-h --help help).include? c
-    end
-
-    def help
-      puts <<EOS
-    ruby #{$0} [options]
-
-    edit        -- edit the current day (default)
-    cat [time]  -- cat a range of days
-    view [date] -- view a date in the editor
-    grep [expr] -- grep for expression
-
-    Copyright 2014 (c) Matthias Beyer
-EOS
+    def non_default_config
+      # TODO: read self[:configfile] file to hash and return
     end
 
   end
 
-  module Utils
-    extend self
-
-    def mkdir_p p
-      FileUtils.mkdir_p p
+  class Options < Hash
+    def []=(k, v)
+      k = non_arg k
+      key, value = parse(k, v)
+      super[key] = value
     end
 
-    def ensure_exists(f, content)
-      return nil if File.exists? f # we don't touch anything if the file exists
+    def [](k)
+      super[non_arg(k)]
+    end
 
-      FileUtils.touch f
+    protected
 
-      File.open(f, "w") do |file|
-        file.puts content
+    def non_arg(str)
+      str.gsub(/^--/, "")
+    end
+
+    def parse(key, value)
+      if key.include? "="
+        key = key.split("=").first
+        value = { key.split("=")[1] => value }
       end
 
-      nil
-    end
-
-    def all_diary_files
-      fs = []
-
-      begin
-        Find.find(Diary::Config::PAGEDIR) { |f| fs << f if diary_file? f }
-      rescue Errno::ENOENT
-        $stderr.puts "Cannot find #{Diary::Config::PAGEDIR}"
-      end
-
-      fs
-    end
-
-    def diary_file?(f)
-      File.basename(file) =~ /.*\.#{Diary::Config::FILE_EXT}/ and not
-        FileTest.directory? file
-    end
-
-    def editor *args
-      exec ([Diary::Config::EDITOR, Diary::Config::EDIT_OPTS] + args)
-    end
-
-    def exec(*args)
-      system args.join(' ')
+      [key, value]
     end
 
   end
 
-end
+  module CreateAbleFromPath
 
-if __FILE__ == $0
-  Diary::Utils.mkdir_p Diary::Config::DIARYDIR
-  opts = Diary::Options.parse! ARGV
+    attr_reader :path
 
-  cmd = opts.command.new opts.command_args
+    def self.from_path(path)
+      raise NoMethodException.new("Not implemented")
+    end
 
-  puts cmd
+    def self.subs_from_path(path, gen_class, &block)
+      Dir.new(path).entries.select(&block).map do |entry|
+        gen_class.from_path(path + "/" + entry, true)
+      end
+    end
+
+  end
+
+  module Indexable
+
+    attr_reader :index
+
+    def index_str(n = 2)
+      @index.to_s.rjust(n, "0")
+    end
+
+    def self.index_from_path(path, regex)
+      path.match(regex).to_s.to_i
+    end
+
+  end
+
+  module Iterateable
+
+    def each &block
+      raise NoMethodException.new("Not implemented")
+    end
+
+  end
+
+  class Entry
+    include CreateAbleFromPath
+    include Indexable
+
+    attr_accessor :time
+    attr_reader :content, :raw
+
+    def initialize(time, content)
+      @time = time
+      @content = content.encode(Encoding::UTF_8)
+      @raw = content
+    end
+
+    def self.from_path(path)
+      time = self.time_from_path(path)
+      raw = File.read path
+
+      Entry.new(time, raw)
+    end
+
+    protected
+
+    def self.time_from_path(path)
+      Time.parse path.match(/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/).to_s
+    end
+
+  end
+
+  class Day
+    include CreateAbleFromPath
+    include Indexable
+    include Iterateable
+
+    attr_accessor :entries
+
+    def initialize(entries, day_index = false)
+      @index = day_index || Date.today.day
+      @entries = entries
+    end
+
+    def each &block
+      @entries.each(&block)
+    end
+
+    def self.from_path(path, create_subs = false)
+      @index = self.index_from_path(path, /[0-9]{2,2}$/)
+      if create_subs
+        @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
+      end
+    end
+
+  end
+
+  class Month
+    include CreateAbleFromPath
+    include Indexable
+    include Iterateable
+
+    attr_accessor :days
+
+    def initialize(days, month_index = false)
+      @index = month_index || Date.today.month
+      @days = days
+    end
+
+    def each &block
+      @days.each(&block)
+    end
+
+    def name
+      Date::MONTHNAMES[@index].downcase
+    end
+
+    def self.from_path(path, create_subs = false)
+      @index = self.index_from_path(path, /[0-9]{2,2}$/)
+      if create_subs
+        @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
+      end
+    end
+
+  end
+
+  class Year
+    include CreateAbleFromPath
+    include Iterateable
+
+    attr_accessor :months
+
+    def initialize(months, y = false)
+      @year = y || Date.today.year
+      @months = months
+    end
+
+    def each &block
+      @months.each(&block)
+    end
+
+    def self.from_path(path, create_subs = false)
+      @path = path
+      @year = self.year_from_path path
+      if create_subs
+        @months = self.subs_from_path(path, Month, lambda { |e| File.directory? e })
+      end
+    end
+
+    protected
+
+    def self.year_from_path path
+      path.match(/[0-9]{4,4}$/).to_s.to_i
+    end
+
+  end
+
 end
