@@ -512,6 +512,8 @@ module Diary
         next_command! until @argv.empty?
       end
 
+      protected
+
       def next_command!
         cmd = @argv.pop
         raise "Not a command: #{cmd}" if not Command.is_command? cmd
