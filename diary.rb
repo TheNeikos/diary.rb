@@ -160,6 +160,28 @@ module Diary
         tree
       end
 
+      protected
+
+      def filter(ary, meth)
+        raise NoMethodException.new "Not implemented"
+      end
+
+      def filter_years tree
+        filter([tree], :years)
+      end
+
+      def filter_months(years)
+        filter(years, :month)
+      end
+
+      def filter_days(months)
+        filter(months, :days)
+      end
+
+      def filter_entries(days)
+        filter(days, :entries)
+      end
+
     end
 
     class TagFilterCommand < FilterCommand
@@ -207,24 +229,9 @@ module Diary
 
       protected
 
+      # override
       def filter(ary, meth)
         ary.map(&meth).flatten.select { |x| x.tags.include? @tagname }
-      end
-
-      def filter_years tree
-        filter([tree], :years)
-      end
-
-      def filter_months(years)
-        filter(years, :month)
-      end
-
-      def filter_days(months)
-        filter(months, :days)
-      end
-
-      def filter_entries(days)
-        filter(days, :entries)
       end
 
     end
