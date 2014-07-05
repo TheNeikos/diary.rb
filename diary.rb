@@ -639,6 +639,10 @@ module Diary
       return true
     end
 
+    def reader_commands
+      only_commands ReaderCommand
+    end
+
     def filter_commands
       only_commands FilterCommand
     end
