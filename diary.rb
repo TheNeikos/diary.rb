@@ -18,6 +18,7 @@
 require 'yaml'
 require 'optparse'
 require 'date'
+require 'time'
 require 'find'
 require 'ostruct'
 require 'fileutils'
@@ -120,6 +121,18 @@ class Entry
     @time = time
     @content = content.encode(Encoding::UTF_8)
     @raw = content
+  end
+
+  def self.from_path(cfg, day, path)
+    @time = self.time_from_path(cfg, day, path)
+    @raw = File.read path
+    @content = @raw.encode(Encoding::UTF_8)
+  end
+
+  protected
+
+  def self.time_from_path(cfg, day, path)
+    Time.parse(day.to_s + path.match(cfg[:time_format]).to_s)
   end
 
 end
