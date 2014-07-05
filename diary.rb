@@ -39,6 +39,20 @@ class Hash
 end
 
 
+class Hash
+
+  def transform_to_symbol_hash
+    each_with_object({}) do |(k,v), h|
+      if v.is_a?(Hash)
+        v = v.transform_to_symbol_hash
+      end
+      h[k.to_sym] = v # Turns {'a'=>1} to {:a=>1}
+    end
+  end
+
+end
+
+
 module Diary
 
   class Config < Hash
