@@ -111,7 +111,7 @@ module Diary
     end
 
     module InstanceAbleCommand
-      attr_reader :compatible_commands, :noncompatible_commands
+      attr_reader :noncompatible_commands
 
       # All Not Compatible commands, can be superclass of own class
       @@noncompatible_commands = []
