@@ -126,7 +126,6 @@ module Diary
       attr_reader :keys, :attributes
 
       @expected_attr_count = [] # all valid command attribute numbers, can be a range
-      @@keys = []
       @attributes = []
 
       def expected_attr_count
@@ -135,6 +134,14 @@ module Diary
         else
           super.expected_attr_count + @expected_attr_count
         end
+      end
+
+      def self.keys
+        []
+      end
+
+      def keys
+        self.class.keys
       end
 
       def add_attribute a
@@ -174,7 +181,10 @@ module Diary
       @@noncompatible_commands = [ QueryCommand ]
 
       @expected_attr_count = [0, 1]
-      @@keys = ["--cat", "-c"]
+
+      def self.keys
+        ["--cat", "-c"]
+      end
 
       def action(tree)
         tree.each do |entry|
@@ -243,7 +253,10 @@ module Diary
       @@noncompatible_commands = [ LimitCommand ]
 
       @expected_attr_count = [ 1 ] # only one
-      @@keys = [ "--between", "-b" ]
+
+      def self.keys
+        [ "--between", "-b" ]
+      end
 
       # override
       def add_attribute a
@@ -343,8 +356,12 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @@keys = [ "--year" ]
+
       @attributes = []
+
+      def self.keys
+        [ "--year" ]
+      end
 
       def search_in? path
         y = @attribute.first
@@ -361,8 +378,11 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @@keys = [ "--year" ]
       @attributes = []
+
+      def self.keys
+        [ "--year" ]
+      end
 
       def search_in? path
         m = @attribute.first
@@ -379,8 +399,11 @@ module Diary
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
       @expected_attr_count = [ 1 ]
-      @@keys = [ "--year" ]
       @attributes = []
+
+      def self.keys
+        [ "--year" ]
+      end
 
       def search_in? path
         d = @attribute.first
