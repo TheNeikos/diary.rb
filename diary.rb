@@ -621,9 +621,29 @@ module Diary
     end
 
     def execute!
+      catlast = query_commands.select { |c| c.is_a? CatLastCommand }
+      if catlast
+        catlast.action()
+        return
+      end
+
+      tree = Tree.from_path(@config[:content_dir], reader_commands)
+      tree.filter!(filter_commands)
+
+      run_queries(tree)
     end
 
     protected
+
+    def run_queries(tree)
+      if query_commands.empty?
+        ListCommand.new(tree).action!
+      else
+        query_commands.each do |qcmd|
+          cmd.action!(tree)
+        end
+      end
+    end
 
     def valid?
       commands_compatible?
