@@ -220,19 +220,15 @@ module Diary
     def self.from_path(path, create_subs = false)
       @path = path
       @year = self.year_from_path path
-      @months = self.months_under(path) if create_subs
+      if create_subs
+        @months = self.subs_from_path(path, Month, lambda { |e| File.directory? e })
+      end
     end
 
     protected
 
     def self.year_from_path path
       path.match(/[0-9]{4,4}$/).to_s.to_i
-    end
-
-    def self.months_undex path
-      Dir.new(path).entries.select { |sub| File.directory? sub }.map do |month|
-        Month.from_path(path + "/" + month)
-      end
     end
 
   end
