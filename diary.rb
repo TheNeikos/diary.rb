@@ -117,6 +117,11 @@ module Diary
       @@noncompatible_commands = []
     end
 
+    # Commands which have an effect on the _reading_ of the tree should contain
+    # this module
+    module ReaderCommand
+    end
+
     class Command
       attr_reader :keys, :attributes
 
