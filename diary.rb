@@ -865,7 +865,8 @@ module Diary
 
     attr_accessor :days
 
-    def initialize(days, month_index = false)
+    def initialize(days, path, month_index = false)
+      @path = path
       @index = month_index || Date.today.month
       @days = days
     end
@@ -891,7 +892,7 @@ module Diary
         days = self.subs_from_path(path, Day) { |e| File.directory? e }
       end
 
-      Month.new(days, index)
+      Month.new(days, path, index)
     end
 
   end
