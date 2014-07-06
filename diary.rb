@@ -121,10 +121,9 @@ module Diary
     end
 
     class Command
-      attr_reader :keys, :attributes, :expected_attr_count
+      attr_reader :keys, :attributes
 
       def initialize
-        @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
         @attributes = []
       end
 
@@ -159,6 +158,11 @@ module Diary
       # All Not Compatible commands, can be superclass of own class
       def self.not_compatible_to ary
         def_returner :noncompatible_commands, ary
+      end
+
+      # fancy meta-programming for generating the #expected_attr_count meth
+      def self.expects_nattrs range
+        def_returner :expected_attr_count, range
       end
 
     end
@@ -196,7 +200,7 @@ module Diary
       with_keys ["--list"]
       with_help "List entries only"
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
 
       def action(tree)
@@ -213,7 +217,7 @@ module Diary
 
       not_compatible_to [ QueryCommand ]
 
-      @expected_attr_count = (0..1)
+      expects_nattrs (0..1)
 
       with_keys ["--cat", "-c"]
       with_help "Print entries"
@@ -254,7 +258,7 @@ module Diary
 
       with_keys ["--last", "-l"]
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
@@ -298,7 +302,7 @@ module Diary
       with_keys [ "--between", "-b" ]
       with_help "Limit the search-range to a range. Ex.: 2013..2014 or 2013-01..2013-02"
 
-      @expected_attr_count = (1..1) # only one
+      expects_nattrs (1..1) # only one
 
       # override
       alias super_add_attribute add_attribute
@@ -368,7 +372,7 @@ module Diary
       with_keys ["--limit-in"]
       with_help "Limit search for a year, year-month or year-month-day"
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       # override
       def search_in? path
@@ -406,7 +410,7 @@ module Diary
       with_keys [ "--year" ]
       with_help "Limit search for a certain year, multiple possible"
 
-      @expected_attr_count = (1..1)
+      expects_nattrs (1..1)
 
       @attributes = []
 
@@ -434,7 +438,8 @@ module Diary
       with_keys [ "--month" ]
       with_help "Limit search for a certain Month, multiple possible. Does not filter years"
 
-      @expected_attr_count = (1..1)
+      expects_nattrs (1..1)
+
       @attributes = []
 
       def search_in? path
@@ -461,7 +466,7 @@ module Diary
       with_keys [ "--day" ]
       with_help "Limit search for a certain day, multiple possible. Does not filter years or months"
 
-      @expected_attr_count = (1..1)
+      expects_nattrs (1..1)
       @attributes = []
 
       def search_in? path
@@ -549,7 +554,7 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       with_keys []
       with_help "Filter for certain Tag. Multiple possible."
@@ -571,7 +576,7 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       with_keys ["--in-category", "-in-c"]
       with_help "Filter for certain Category. Multiple possible."
@@ -595,7 +600,7 @@ module Diary
       include ExecuteableCommand
       include Uniqueness
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       not_compatible_to [ Command ] # either add or something else.
 
@@ -638,7 +643,7 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
       not_compatible_to [ LimitCommand, FilterCommand, ModifyCommand, AddCommand ]
 
@@ -655,7 +660,7 @@ module Diary
       with_keys ["--tag"]
       with_help "Add a tag to one or more entries"
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
     end
 
@@ -667,7 +672,7 @@ module Diary
       with_keys ["--category"]
       with_help "Add one or several entries to a category"
 
-      @expected_attr_count = (0..0)
+      expects_nattrs (0..0)
 
     end
 
@@ -746,7 +751,7 @@ module Diary
       def create_instance!(c)
         instance = c.new()
 
-        0.upto(instance.expected_attr_count.max) do
+        0.upto(instance.class.expected_attr_count.max) do
           break if @argv.empty?
 
           if Command.is_command?(@argv.first)
