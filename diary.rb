@@ -182,7 +182,7 @@ module Diary
       end
 
       def action(tree)
-        CommandParser.constants.map do |c|
+        CommandParser.constants.select do |c|
           c.is_a? CommandParser::Command and c.is_a? InstanceAbleCommand
         end.sort.each do |c|
           puts "#{c.keys.join(", ")}\t#{c.help}"
