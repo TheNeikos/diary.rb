@@ -115,6 +115,11 @@ module Diary
 
       # All Not Compatible commands, can be superclass of own class
       @@noncompatible_commands = []
+
+      def self.help
+        raise NoMethodException.new "Not implemented"
+      end
+
     end
 
     # Commands which have an effect on the _reading_ of the tree should contain
@@ -178,6 +183,10 @@ module Diary
         ["--list"]
       end
 
+      def self.help
+        "List entries only"
+      end
+
       def action!(tree)
         tree.all_entries.each do |entry|
           puts "[#{entry.hash}] #{entry.time}"
@@ -196,6 +205,10 @@ module Diary
 
       def self.keys
         ["--cat", "-c"]
+      end
+
+      def self.help
+        "Print entries"
       end
 
       def action(tree)
@@ -277,6 +290,10 @@ module Diary
         [ "--between", "-b" ]
       end
 
+      def self.help
+        "Limit the search-range to a range. Ex.: 2013..2014 or 2013-01..2013-02"
+      end
+
       # override
       alias super_add_attribute add_attribute
       def add_attribute a
@@ -348,6 +365,10 @@ module Diary
         ["--limit-in"]
       end
 
+      def self.help
+        "Limit search for a year, year-month or year-month-day"
+      end
+
       # override
       def search_in? path
         if @start_year and not path.include? @start_year.to_s
@@ -389,6 +410,10 @@ module Diary
         [ "--year" ]
       end
 
+      def self.help
+        "Limit search for a certain year, multiple possible"
+      end
+
       def search_in? path
         y = @attribute.first
 
@@ -417,6 +442,10 @@ module Diary
         [ "--month" ]
       end
 
+      def self.help
+        "Limit search for a certain Month, multiple possible. Does not filter years"
+      end
+
       def search_in? path
         m = @attribute.first
 
@@ -443,6 +472,10 @@ module Diary
 
       def self.keys
         [ "--day" ]
+      end
+
+      def self.help
+        "Limit search for a certain day, multiple possible. Does not filter years or months"
       end
 
       def search_in? path
@@ -536,6 +569,10 @@ module Diary
         []
       end
 
+      def self.help
+        "Filter for certain Tag. Multiple possible."
+      end
+
       def initialize(name)
         @tagname = name
       end
@@ -557,6 +594,10 @@ module Diary
 
       def self.keys
         ["--in-category", "-in-c"]
+      end
+
+      def self.help
+        "Filter for certain Category. Multiple possible."
       end
 
       def initialize(name)
@@ -582,6 +623,10 @@ module Diary
 
       def self.keys
         ["--add"]
+      end
+
+      def self.help
+        "Add an entry. Default command."
       end
 
       @@noncompatible_commands = [ Command ] # either add or something else.
@@ -631,6 +676,10 @@ module Diary
         ["--edit"]
       end
 
+      def self.help
+        "Edit an entry"
+      end
+
     end
 
     class TagCommand < ModifyCommand
@@ -644,6 +693,10 @@ module Diary
         ["--tag"]
       end
 
+      def self.help
+        "Add a tag to one or more entries"
+      end
+
     end
 
     class CategorizeCommand < ModifyCommand
@@ -655,6 +708,10 @@ module Diary
 
       def self.keys
         ["--category"]
+      end
+
+      def self.help
+        "Add one or several entries to a category"
       end
 
     end
