@@ -688,11 +688,7 @@ module Diary
 
       def ensure_unique_commands!
         @commands.uniq! do |c|
-          if c.is_a? Uniqueness
-            c.uniqueness
-          else
-            false
-          end || c.class
+          (c.is_a?(Uniqueness) ? c.uniqueness : false ) || c.class
         end
       end
 
