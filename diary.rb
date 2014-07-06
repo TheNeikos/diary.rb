@@ -215,7 +215,7 @@ module Diary
         "List entries only"
       end
 
-      def action!(tree)
+      def action(tree)
         tree.all_entries.each do |entry|
           puts "[#{entry.hash}] #{entry.time}"
         end
@@ -890,10 +890,10 @@ module Diary
 
     def run_queries(tree)
       if query_commands.empty?
-        ListCommand.new(tree).action!
+        ListCommand.new(tree).action
       else
         query_commands.each do |qcmd|
-          qcmd.action!(tree)
+          qcmd.action(tree)
         end
       end
     end
