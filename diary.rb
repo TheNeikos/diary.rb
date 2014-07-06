@@ -902,7 +902,7 @@ module Diary
     def commands_compatible?
       @commands.each do |command|
         @commands.each do |other|
-          return false if command.class.noncompatible_commands.include? other
+          return false if command.noncompatible_commands.include? other
         end
       end
 
