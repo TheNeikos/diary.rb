@@ -26,6 +26,7 @@ require 'digest'
 require 'digest/sha2'
 require 'json'
 
+require './config.rb'
 
 class Array
 
@@ -44,35 +45,6 @@ class Enumerator::Lazy
 end
 
 module Diary
-
-  class Config < Hash
-
-    # defaults
-    def initialize(other_config_path = false)
-      self[:root]         = Dir.home + "/.diary"
-      self[:content_dir]  = self[:root] + "/content"
-      self[:configfile]   = other_config_path || self[:root] + "/diary.conf"
-      self[:editor]       = "/usr/bin/vi"
-      self[:ext]          = "txt"
-
-      self.merge non_default_config
-    end
-
-    def []=(k, v)
-      super[k.to_sym] = v
-    end
-
-    def [](k)
-      super[k.to_sym]
-    end
-
-    protected
-
-    def non_default_config
-      # TODO: read self[:configfile] file to hash and return
-    end
-
-  end
 
   module CommandParser
 
@@ -509,7 +481,7 @@ module Diary
       # After that we remove the entries, days, months and years (in this order)
       # from the tree, to ensure entries which are kept, are also kept if the
       # appropriate year for the entry is not kept
-      #
+
       def filter_tree tree
         years = filter_years tree.years
         months = filter_months(tree.years.select { |y| not years.include? y })
