@@ -881,7 +881,7 @@ module Diary
       end
 
       tree = Tree.from_path(@config[:content_dir], reader_commands)
-      tree.filter!(filter_commands)
+      tree = filter_tree(tree, filter_commands)
 
       run_queries(tree)
     end
@@ -910,6 +910,10 @@ module Diary
       end
 
       return true
+    end
+
+    def filter_tree(tree, commands)
+      tree
     end
 
     def reader_commands
