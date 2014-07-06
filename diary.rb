@@ -1071,7 +1071,7 @@ module Diary
     end
 
     def run_queries(tree, queries)
-      queries << ListCommand.new if queries.empty?
+      queries << CommandParser::ListCommand.new if queries.empty?
       queries.each { |qcmd| qcmd.action(tree) }
     end
 
