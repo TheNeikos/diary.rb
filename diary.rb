@@ -775,10 +775,10 @@ module Diary
       raise NoMethodException.new("Not implemented")
     end
 
-    def self.subs_from_path(path, gen_class, &block)
+    def self.subs_from_path(path, gen_class, reader_commands, &block)
       Dir.new(path).entries.select(&block).map do |entry|
         next if ["..", "."].include? entry
-        gen_class.from_path(path + "/" + entry, true)
+        gen_class.from_path(path + "/" + entry, reader_commands)
       end
     end
 
@@ -864,13 +864,13 @@ module Diary
       @entries.each(&block)
     end
 
-    def self.from_path(path, create_subs = false)
+    def self.from_path(path, reader_commands)
       index = self.index_from_path(path, /[0-9]{2,2}$/)
-      entries = []
-      if create_subs
-        entries = self.subs_from_path(path, Entry) { |e| File.file? e }
+      entries = self.subs_from_path(path, Entry, reader_commands) do |subpath|
+        File.file?(subpath) and reader_commands.lazy.map do |rcmd|
+          rcmd.search_in? subpath
+        end.any?
       end
-
       Day.new(entries, path, index)
     end
 
@@ -910,13 +910,13 @@ module Diary
       h
     end
 
-    def self.from_path(path, create_subs = false)
+    def self.from_path(path, reader_commands)
       index = self.index_from_path(path, /[0-9]{2,2}$/)
-      days = []
-      if create_subs
-        days = self.subs_from_path(path, Day) { |e| File.directory? e }
+      days = self.subs_from_path(path, Day, reader_commands) do |subpath|
+        File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
+          rcmd.search_in? subpath
+        end.any?
       end
-
       Month.new(days, path, index)
     end
 
@@ -936,11 +936,12 @@ module Diary
       @months.each(&block)
     end
 
-    def self.from_path(path, create_subs = false)
+    def self.from_path(path, reader_commands)
       year = self.year_from_path path
-      months = []
-      if create_subs
-        months = self.subs_from_path(path, Month) { |e| puts "Check: #{e}"; File.directory? e }
+      months = self.subs_from_path(path, Month, reader_commands) do |sub_path|
+        File.directory? sub_path and reader_commands.lazy.map do |rcmd|
+          rcmd.search_in? sub_path
+        end.any?
       end
 
       Year.new(months, path, year)
@@ -979,11 +980,12 @@ module Diary
       @years = years
     end
 
-    def self.from_path(path, create_subs = false)
+    def self.from_path(path, reader_commands)
       path = path
-
-      if create_subs
-        years = self.subs_from_path(path, Year) { |e| File.directory? e }
+      years = self.subs_from_path(path, Year, reader_commands) do |subpath|
+        File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
+          rcmd.search_in? sub_path
+        end.any?
       end
       Tree.new(path, years)
     end
