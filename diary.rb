@@ -395,6 +395,13 @@ module Diary
         path.match(/#{y.to_s}\/[0-9]{2,2}\/[0-9]{2,2}\//)
       end
 
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
+      end
+
     end
 
     class LimitMonthCommand < LimitInCommand
@@ -416,6 +423,13 @@ module Diary
         path.match(/[0-9]{4,4}\/#{m}\/[0-9]{2,2}\//)
       end
 
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
+      end
+
     end
 
     class LimitDayCommand < LimitInCommand
@@ -435,6 +449,13 @@ module Diary
         d = @attribute.first
 
         path.match(/[0-9]{4,4}\/[0-9]{2,2}\/#{d}\//)
+      end
+
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
       end
 
     end
