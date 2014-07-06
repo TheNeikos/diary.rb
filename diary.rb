@@ -934,20 +934,6 @@ module Diary
 
   end
 
-  module Indexable
-
-    attr_reader :index
-
-    def index_str(n = 2)
-      @index.to_s.rjust(n, "0")
-    end
-
-    def self.index_from_path(path, regex)
-      path.match(regex).to_s.to_i
-    end
-
-  end
-
   module Iterateable
 
     def each &block
@@ -958,7 +944,7 @@ module Diary
 
   class TreeElement
 
-    attr_reader :path
+    attr_reader :path, :index
 
     def self.from_path(path)
       raise NoMethodException.new("Not implemented")
@@ -970,11 +956,18 @@ module Diary
       end
     end
 
+    def self.index_from_path(path, regex)
+      path.match(regex).to_s.to_i
+    end
+
+    def index_str(n = 2)
+      @index.to_s.rjust(n, "0")
+    end
+
   end
 
 
   class Entry < TreeElement
-    include Indexable
 
     attr_accessor :time
     attr_reader :content, :raw, :hash
@@ -1005,7 +998,6 @@ module Diary
   end
 
   class Day < TreeElement
-    include Indexable
     include Iterateable
 
     attr_accessor :entries
@@ -1029,7 +1021,6 @@ module Diary
   end
 
   class Month < TreeElement
-    include Indexable
     include Iterateable
 
     attr_accessor :days
