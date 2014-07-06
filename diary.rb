@@ -83,11 +83,6 @@ module Diary
 
     module InstanceAbleCommand
 
-      # All Not Compatible commands, can be superclass of own class
-      def noncompatible_commands
-        []
-      end
-
       def self.help
         raise NoMethodException.new "Not implemented"
       end
@@ -133,6 +128,30 @@ module Diary
         ["-", "+"].map { |e| str.start_with? e }.any?
       end
 
+      def self.def_returner(name, obj)
+        define_singleton_method name do
+          obj
+        end
+      end
+
+      # fancy meta-programming for generating :keys method on the fly
+      def self.with_keys ks
+        def_returner :keys, ks
+      end
+
+      # fancy meta-programming for generating :help method on the fly
+      def self.with_help str
+        def_returner :help, str
+      end
+
+      # fancy meta-programming for generating :noncompatible_commands method on
+      # the fly.
+      #
+      # All Not Compatible commands, can be superclass of own class
+      def self.not_compatible_to ary
+        def_returner :noncompatible_commands, ary
+      end
+
     end
 
 
@@ -140,13 +159,8 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def self.keys
-        ["-h", "--help"]
-      end
-
-      def self.help
-        "Print the help and exit"
-      end
+      with_keys ["-h", "--help"]
+      with_help "Print the help and exit"
 
       def action(tree)
         CommandParser.constants.select do |c|
@@ -168,19 +182,13 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      def noncompatible_commands
-        [ QueryCommand ]
-      end
+      not_compatible_to [ QueryCommand ]
+
+      with_keys ["--list"]
+      with_help "List entries only"
 
       @expected_attr_count = (0..0)
 
-      def self.keys
-        ["--list"]
-      end
-
-      def self.help
-        "List entries only"
-      end
 
       def action(tree)
         tree.all_entries.each do |entry|
@@ -194,19 +202,12 @@ module Diary
       include ExecuteableCommand
       include Uniqueness
 
-      def noncompatible_commands
-        [ QueryCommand ]
-      end
+      not_compatible_to [ QueryCommand ]
 
       @expected_attr_count = (0..1)
 
-      def self.keys
-        ["--cat", "-c"]
-      end
-
-      def self.help
-        "Print entries"
-      end
+      with_keys ["--cat", "-c"]
+      with_help "Print entries"
 
       def action(tree)
         tree.each do |y|
@@ -240,15 +241,11 @@ module Diary
       include ConfigReaderCommand
       include Uniqueness
 
-      def noncompatible_commands
-        [ QueryCommand ]
-      end
+      not_compatible_to [ QueryCommand ]
+
+      with_keys ["--last", "-l"]
 
       @expected_attr_count = (0..0)
-
-      def self.keys
-        ["--last", "-l"]
-      end
 
       def action(tree)
         # `tree` should be empty, as this command is also a query command
@@ -287,19 +284,12 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def noncompatible_commands
-        [ LimitCommand ]
-      end
+      not_compatible_to [ LimitCommand ]
+
+      with_keys [ "--between", "-b" ]
+      with_help "Limit the search-range to a range. Ex.: 2013..2014 or 2013-01..2013-02"
 
       @expected_attr_count = (1..1) # only one
-
-      def self.keys
-        [ "--between", "-b" ]
-      end
-
-      def self.help
-        "Limit the search-range to a range. Ex.: 2013..2014 or 2013-01..2013-02"
-      end
 
       # override
       alias super_add_attribute add_attribute
@@ -364,19 +354,12 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def noncompatible_commands
-        [ LimitCommand ]
-      end
+      not_compatible_to [ LimitCommand ]
+
+      with_keys ["--limit-in"]
+      with_help "Limit search for a year, year-month or year-month-day"
 
       @expected_attr_count = (0..0)
-
-      def self.keys
-        ["--limit-in"]
-      end
-
-      def self.help
-        "Limit search for a year, year-month or year-month-day"
-      end
 
       # override
       def search_in? path
@@ -409,21 +392,14 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def noncompatible_commands
-        [ LimitRangeCommand, LimitInCommand ]
-      end
+      not_compatible_to [ LimitRangeCommand, LimitInCommand ]
+
+      with_keys [ "--year" ]
+      with_help "Limit search for a certain year, multiple possible"
 
       @expected_attr_count = (1..1)
 
       @attributes = []
-
-      def self.keys
-        [ "--year" ]
-      end
-
-      def self.help
-        "Limit search for a certain year, multiple possible"
-      end
 
       def search_in? path
         y = @attribute.first
@@ -444,20 +420,13 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def noncompatible_commands
-        [ LimitRangeCommand, LimitInCommand ]
-      end
+      not_compatible_to [ LimitRangeCommand, LimitInCommand ]
+
+      with_keys [ "--month" ]
+      with_help "Limit search for a certain Month, multiple possible. Does not filter years"
 
       @expected_attr_count = (1..1)
       @attributes = []
-
-      def self.keys
-        [ "--month" ]
-      end
-
-      def self.help
-        "Limit search for a certain Month, multiple possible. Does not filter years"
-      end
 
       def search_in? path
         m = @attribute.first
@@ -478,20 +447,13 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      def noncompatible_commands
-        [ LimitRangeCommand, LimitInCommand ]
-      end
+      not_compatible_to [ LimitRangeCommand, LimitInCommand ]
+
+      with_keys [ "--day" ]
+      with_help "Limit search for a certain day, multiple possible. Does not filter years or months"
 
       @expected_attr_count = (1..1)
       @attributes = []
-
-      def self.keys
-        [ "--day" ]
-      end
-
-      def self.help
-        "Limit search for a certain day, multiple possible. Does not filter years or months"
-      end
 
       def search_in? path
         d = @attribute.first
@@ -580,13 +542,8 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      def self.keys
-        []
-      end
-
-      def self.help
-        "Filter for certain Tag. Multiple possible."
-      end
+      with_keys []
+      with_help "Filter for certain Tag. Multiple possible."
 
       def initialize(name)
         @tagname = name
@@ -607,13 +564,8 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      def self.keys
-        ["--in-category", "-in-c"]
-      end
-
-      def self.help
-        "Filter for certain Category. Multiple possible."
-      end
+      with_keys ["--in-category", "-in-c"]
+      with_help "Filter for certain Category. Multiple possible."
 
       def initialize(name)
         @catname = name
@@ -636,17 +588,10 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      def self.keys
-        ["--add"]
-      end
+      not_compatible_to [ Command ] # either add or something else.
 
-      def self.help
-        "Add an entry. Default command."
-      end
-
-      def noncompatible_commands
-        [ Command ] # either add or something else.
-      end
+      with_keys ["--add"]
+      with_help "Add an entry. Default command."
 
       def action(tree)
         dir = generate_dir_path
@@ -686,55 +631,34 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      def noncompatible_commands
-        [ LimitCommand, FilterCommand, ModifyCommand, AddCommand ]
-      end
+      not_compatible_to [ LimitCommand, FilterCommand, ModifyCommand, AddCommand ]
 
-      def self.keys
-        ["--edit"]
-      end
-
-      def self.help
-        "Edit an entry"
-      end
+      with_keys ["--edit"]
+      with_help "Edit an entry"
 
     end
 
     class TagCommand < ModifyCommand
       include InstanceAbleCommand
 
-      def noncompatible_commands
-        [ EditCommand ]
-      end
+      not_compatible_to [ EditCommand ]
+
+      with_keys ["--tag"]
+      with_help "Add a tag to one or more entries"
 
       @expected_attr_count = (0..0)
-
-      def self.keys
-        ["--tag"]
-      end
-
-      def self.help
-        "Add a tag to one or more entries"
-      end
 
     end
 
     class CategorizeCommand < ModifyCommand
       include InstanceAbleCommand
 
-      def noncompatible_commands
-        [ EditCommand ]
-      end
+      not_compatible_to [ EditCommand ]
+
+      with_keys ["--category"]
+      with_help "Add one or several entries to a category"
 
       @expected_attr_count = (0..0)
-
-      def self.keys
-        ["--category"]
-      end
-
-      def self.help
-        "Add one or several entries to a category"
-      end
 
     end
 
@@ -883,7 +807,7 @@ module Diary
     def commands_compatible?
       @commands.each do |command|
         @commands.each do |other|
-          return false if command.noncompatible_commands.include? other
+          return false if command.class.noncompatible_commands.include? other
         end
       end
 
