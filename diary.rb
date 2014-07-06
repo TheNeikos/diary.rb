@@ -133,10 +133,6 @@ module Diary
         ["-", "+"].map { |e| str.start_with? e }.any?
       end
 
-      def self.assign_cmd? str
-        str.include? "="
-      end
-
     end
 
 
