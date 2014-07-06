@@ -814,8 +814,10 @@ module Diary
       @raw = content
     end
 
-    def self.from_path(path)
-      Entry.new(self.time_from_path(path), path)
+    def self.from_path(path, reader_commands)
+      if reader_commands.lazy.map { |rcmd| rcmd.search_in? path }.any_or_none?
+        Entry.new(self.time_from_path(path), path)
+      end
     end
 
     def hash
