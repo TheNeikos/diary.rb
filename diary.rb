@@ -301,7 +301,7 @@ module Diary
         end_date = a.split("..").last
 
         parse_start_date start_date
-        parse_start_date end_date
+        parse_end_date end_date
       end
 
       def parse_start_date start_date
