@@ -1011,4 +1011,5 @@ if __FILE__ == $0
   cp.parse!
 
   puts cp.commands
+  puts cp.commands.map(&:inspect)
 end
