@@ -202,10 +202,17 @@ module Diary
 
 
       def action(tree)
-        tree.all_entries.each do |entry|
-          puts "[#{entry.hash}] #{entry.time}"
+        tree.years.each do |year|
+          year.months.each do |month|
+            month.days.each do |day|
+              day.entries.each do |entry|
+                puts "[#{entry.hash}] #{entry.time}"
+              end
+            end
+          end
         end
       end
+
     end
 
     class CatCommand < QueryCommand
@@ -983,6 +990,8 @@ module Diary
   class Tree < TreeElement
     include Iterateable
 
+    attr_reader :years
+
     @years = []
 
     def initialize(path, years)
@@ -1016,16 +1025,6 @@ module Diary
 
     def each(&block)
       @years.each(&block)
-    end
-
-    def all_entries(&block)
-      @years.each do |year|
-        year.months.each do |month|
-          month.days.each do |day|
-            day.entries.each(&block)
-          end
-        end
-      end
     end
 
     def keep_entries entries
