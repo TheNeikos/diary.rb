@@ -856,7 +856,7 @@ module Diary
       h[:categories]  = []
       h[:path]        = @path
       h[:entries]     = Hash.new
-      @entries.each { |e| h[:entries][e.to_sym] = e.to_hash }
+      @entries.compact.each { |e| h[:entries][e.to_sym] = e.to_hash }
       h
     end
 
@@ -906,7 +906,7 @@ module Diary
       h[:index]       = @index
       h[:path]        = @path
       h[:days]        = Hash.new
-      @days.each { |d| h[:days][d.to_sym] = d.to_hash }
+      @days.compact.each { |d| h[:days][d.to_sym] = d.to_hash }
       h
     end
 
@@ -940,7 +940,7 @@ module Diary
       year = self.year_from_path path
       months = []
       if create_subs
-        months = self.subs_from_path(path, Month) { |e| File.directory? e }
+        months = self.subs_from_path(path, Month) { |e| puts "Check: #{e}"; File.directory? e }
       end
 
       Year.new(months, path, year)
@@ -957,7 +957,7 @@ module Diary
       h[:path]        = @path
       h[:year]        = @year
       h[:months]      = Hash.new
-      @months.each { |month| h[:months][month.to_sym] = month.to_hash }
+      @months.compact.each { |month| h[:months][month.to_sym] = month.to_hash }
       h
     end
 
@@ -998,7 +998,7 @@ module Diary
       h[:categories]  = []
       h[:path]        = @path
       h[:years]       = Hash.new
-      @years.each { |year| h[:years][year.to_sym] = year.to_hash }
+      @years.compact.each { |year| h[:years][year.to_sym] = year.to_hash }
       h
     end
 
