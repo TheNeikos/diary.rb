@@ -92,6 +92,14 @@ module Diary
         raise NoMethodException.new "Not implemented"
       end
 
+      def self.keys
+        []
+      end
+
+      def keys
+        self.class.keys
+      end
+
     end
 
     # Commands which have an effect on the _reading_ of the tree should contain
@@ -114,14 +122,6 @@ module Diary
       def initialize
         @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
         @attributes = []
-      end
-
-      def self.keys
-        []
-      end
-
-      def keys
-        self.class.keys
       end
 
       def add_attribute a
