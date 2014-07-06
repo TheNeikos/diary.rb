@@ -115,6 +115,11 @@ module Diary
 
       # All Not Compatible commands, can be superclass of own class
       @@noncompatible_commands = []
+
+      def self.help
+        raise NoMethodException.new "Not implemented"
+      end
+
     end
 
     # Commands which have an effect on the _reading_ of the tree should contain
@@ -163,6 +168,31 @@ module Diary
     end
 
 
+    class HelpCommand < Command
+      include InstanceAbleCommand
+      include ReaderCommand
+
+      def self.keys
+        ["-h", "--help"]
+      end
+
+      def self.help
+        "Print the help and exit"
+      end
+
+      def action(tree)
+        CommandParser.constants.map do |c|
+          c.is_a? CommandParser::Command and c.is_a? InstanceAbleCommand
+        end.sort.each do |c|
+          puts "#{c.keys.join(", ")}\t#{c.help}"
+        end
+
+        exit 1
+      end
+
+    end
+
+
     class QueryCommand < Command
     end
 
@@ -176,6 +206,10 @@ module Diary
 
       def self.keys
         ["--list"]
+      end
+
+      def self.help
+        "List entries only"
       end
 
       def action!(tree)
@@ -196,6 +230,10 @@ module Diary
 
       def self.keys
         ["--cat", "-c"]
+      end
+
+      def self.help
+        "Print entries"
       end
 
       def action(tree)
@@ -277,6 +315,10 @@ module Diary
         [ "--between", "-b" ]
       end
 
+      def self.help
+        "Limit the search-range to a range. Ex.: 2013..2014 or 2013-01..2013-02"
+      end
+
       # override
       alias super_add_attribute add_attribute
       def add_attribute a
@@ -348,6 +390,10 @@ module Diary
         ["--limit-in"]
       end
 
+      def self.help
+        "Limit search for a year, year-month or year-month-day"
+      end
+
       # override
       def search_in? path
         if @start_year and not path.include? @start_year.to_s
@@ -389,6 +435,10 @@ module Diary
         [ "--year" ]
       end
 
+      def self.help
+        "Limit search for a certain year, multiple possible"
+      end
+
       def search_in? path
         y = @attribute.first
 
@@ -417,6 +467,10 @@ module Diary
         [ "--month" ]
       end
 
+      def self.help
+        "Limit search for a certain Month, multiple possible. Does not filter years"
+      end
+
       def search_in? path
         m = @attribute.first
 
@@ -443,6 +497,10 @@ module Diary
 
       def self.keys
         [ "--day" ]
+      end
+
+      def self.help
+        "Limit search for a certain day, multiple possible. Does not filter years or months"
       end
 
       def search_in? path
@@ -536,6 +594,10 @@ module Diary
         []
       end
 
+      def self.help
+        "Filter for certain Tag. Multiple possible."
+      end
+
       def initialize(name)
         @tagname = name
       end
@@ -557,6 +619,10 @@ module Diary
 
       def self.keys
         ["--in-category", "-in-c"]
+      end
+
+      def self.help
+        "Filter for certain Category. Multiple possible."
       end
 
       def initialize(name)
@@ -582,6 +648,10 @@ module Diary
 
       def self.keys
         ["--add"]
+      end
+
+      def self.help
+        "Add an entry. Default command."
       end
 
       @@noncompatible_commands = [ Command ] # either add or something else.
@@ -631,6 +701,10 @@ module Diary
         ["--edit"]
       end
 
+      def self.help
+        "Edit an entry"
+      end
+
     end
 
     class TagCommand < ModifyCommand
@@ -644,6 +718,10 @@ module Diary
         ["--tag"]
       end
 
+      def self.help
+        "Add a tag to one or more entries"
+      end
+
     end
 
     class CategorizeCommand < ModifyCommand
@@ -655,6 +733,10 @@ module Diary
 
       def self.keys
         ["--category"]
+      end
+
+      def self.help
+        "Add one or several entries to a category"
       end
 
     end
@@ -686,7 +768,7 @@ module Diary
 
       def available_commands
         [
-          Command,
+          HelpCommand,
           QueryCommand,
           CatCommand,
           CatLastCommand,
