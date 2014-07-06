@@ -650,7 +650,16 @@ module Diary
 
       def parse!
         next_command! until @argv.empty?
-        @commands.uniq! { |c| c.uniqueness || c.class }
+      end
+
+      def ensure_unique_commands!
+        @commands.uniq! do |c|
+          if c.is_a? Uniqueness
+            c.uniqueness
+          else
+            false
+          end || c.class
+        end
       end
 
       def available_commands
