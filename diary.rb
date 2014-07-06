@@ -745,7 +745,7 @@ module Diary
             debug("Not adding #{@argv.first} as arg to #{instance}")
           else
             debug("Adding attribute to #{c} : #{@argv.first}")
-            instance.add_attribute(@argv.pop)
+            instance.add_attribute(@argv.shift)
           end
         end
 
