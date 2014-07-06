@@ -877,8 +877,7 @@ module Diary
     end
 
     def execute!
-      try_help
-      try_catlast and exit 1
+      try_precommands and exit 0
 
       tree = build_tree
       tree = filter_tree(tree, filter_commands)
@@ -888,19 +887,17 @@ module Diary
 
     protected
 
-    def try_help
-      help = @commands.select { |c| c.is_a? CommandParser::HelpCommand }
-      help.first.action([]) if help.one?
-    end
-
-    def try_catlast
-      catlast = query_commands.select { |c| c.is_a? CommandParser::CatLastCommand }
-      if catlast.one?
-        catlast.first.action()
-        true
-      else
-        false
+    def try_precommands
+      pre = pre_commands
+      until pre.empty? do
+        p = pre.shift
+        c = @commands.select { |cmd| cmd.is_a? p }
+        if c.one?
+          c.first.action([])
+          return true
+        end
       end
+      false
     end
 
     def build_tree
@@ -948,6 +945,14 @@ module Diary
 
     def only_commands klass
       @commands.select { |c| c.is_a? klass }
+    end
+
+    def pre_commands
+      [
+        CommandParser::HelpCommand,
+        CommandParser::ListCommand,
+        CommandParser::AddCommand
+      ]
     end
 
   end
