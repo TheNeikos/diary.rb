@@ -877,14 +877,8 @@ module Diary
     end
 
     def execute!
-      help = @commands.select { |c| c.is_a? CommandParser::HelpCommand }
-      help.first.action([]) unless help.empty?
-
-      catlast = query_commands.select { |c| c.is_a? CommandParser::CatLastCommand }
-      if catlast.first
-        catlast.first.action()
-        return
-      end
+      try_help
+      try_catlast and exit 1
 
       tree = Tree.from_path(@config[:content_dir], reader_commands)
       tree = filter_tree(tree, filter_commands)
@@ -893,6 +887,21 @@ module Diary
     end
 
     protected
+
+    def try_help
+      help = @commands.select { |c| c.is_a? CommandParser::HelpCommand }
+      help.first.action([]) if help.one?
+    end
+
+    def try_catlast
+      catlast = query_commands.select { |c| c.is_a? CommandParser::CatLastCommand }
+      if catlast.one?
+        catlast.first.action()
+        true
+      else
+        false
+      end
+    end
 
     def run_queries(tree)
       if query_commands.empty?
