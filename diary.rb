@@ -122,11 +122,22 @@ module Diary
     module ReaderCommand
     end
 
+    # If a command is only able to appear once, include this module
+    module Uniqueness
+
+      def uniqueness
+        true
+      end
+
+    end
+
     class Command
       attr_reader :keys, :attributes, :expected_attr_count
 
-      @expected_attr_count = [] # all valid command attribute numbers, can be a range
-      @attributes = []
+      def initialize
+        @expected_attr_count = (0..0) # all valid command attribute numbers, can be a range
+        @attributes = []
+      end
 
       def self.keys
         []
@@ -157,8 +168,11 @@ module Diary
 
     class ListCommand < QueryCommand
       include InstanceAbleCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--list"]
@@ -174,10 +188,11 @@ module Diary
     class CatCommand < QueryCommand
       include InstanceAbleCommand
       include ExecuteableCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
 
-      @expected_attr_count = [0, 1]
+      @expected_attr_count = (0..1)
 
       def self.keys
         ["--cat", "-c"]
@@ -207,8 +222,11 @@ module Diary
       include ExecuteableCommand
       include ExtendedQueryCommand
       include ConfigReaderCommand
+      include Uniqueness
 
       @@noncompatible_commands = [ QueryCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--last", "-l"]
@@ -253,15 +271,16 @@ module Diary
 
       @@noncompatible_commands = [ LimitCommand ]
 
-      @expected_attr_count = [ 1 ] # only one
+      @expected_attr_count = (1..1) # only one
 
       def self.keys
         [ "--between", "-b" ]
       end
 
       # override
+      alias super_add_attribute add_attribute
       def add_attribute a
-        super.add_attribute a
+        super_add_attribute a
         parse_attribute a
       end
 
@@ -282,7 +301,7 @@ module Diary
         end_date = a.split("..").last
 
         parse_start_date start_date
-        parse_start_date end_date
+        parse_end_date end_date
       end
 
       def parse_start_date start_date
@@ -308,8 +327,8 @@ module Diary
         end
 
         d = parts.pop.to_i if nparts == 3
-        m = parts.pop.to_i if nparts <= 2
-        y = parts.pop.to_i if nparts <= 1
+        m = parts.pop.to_i if nparts >= 2
+        y = parts.pop.to_i if nparts >= 1
 
         [y, m || 1, d || 1]
       end
@@ -322,6 +341,8 @@ module Diary
       include ReaderCommand
 
       @@noncompatible_commands = [ LimitCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--limit-in"]
@@ -360,7 +381,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
 
       @attributes = []
 
@@ -374,6 +395,13 @@ module Diary
         path.match(/#{y.to_s}\/[0-9]{2,2}\/[0-9]{2,2}\//)
       end
 
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
+      end
+
     end
 
     class LimitMonthCommand < LimitInCommand
@@ -382,7 +410,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
       @attributes = []
 
       def self.keys
@@ -395,6 +423,13 @@ module Diary
         path.match(/[0-9]{4,4}\/#{m}\/[0-9]{2,2}\//)
       end
 
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
+      end
+
     end
 
     class LimitDayCommand < LimitInCommand
@@ -403,7 +438,7 @@ module Diary
 
       @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
 
-      @expected_attr_count = [ 1 ]
+      @expected_attr_count = (1..1)
       @attributes = []
 
       def self.keys
@@ -414,6 +449,13 @@ module Diary
         d = @attribute.first
 
         path.match(/[0-9]{4,4}\/[0-9]{2,2}\/#{d}\//)
+      end
+
+      protected
+
+      # override
+      def parse_attribute a
+        # nothing
       end
 
     end
@@ -486,8 +528,9 @@ module Diary
 
     class TagFilterCommand < FilterCommand
       include InstanceAbleCommand
+      include Uniqueness
 
-      @expected_attr_count = [ 0 ]
+      @expected_attr_count = (0..0)
 
       def self.keys
         []
@@ -508,6 +551,9 @@ module Diary
 
     class CategoryFilterCommand < FilterCommand
       include InstanceAbleCommand
+      include Uniqueness
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--in-category", "-in-c"]
@@ -530,6 +576,9 @@ module Diary
     class AddCommand < Command
       include InstanceAbleCommand
       include ExecuteableCommand
+      include Uniqueness
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--add"]
@@ -571,6 +620,9 @@ module Diary
 
     class EditCommand < ModifyCommand
       include InstanceAbleCommand
+      include Uniqueness
+
+      @expected_attr_count = (0..0)
 
       @@noncompatible_commands = [ LimitCommand, FilterCommand,
                                   ModifyCommand, AddCommand ]
@@ -586,6 +638,8 @@ module Diary
 
       @@noncompatible_commands = [ EditCommand ]
 
+      @expected_attr_count = (0..0)
+
       def self.keys
         ["--tag"]
       end
@@ -596,6 +650,8 @@ module Diary
       include InstanceAbleCommand
 
       @@noncompatible_commands = [ EditCommand ]
+
+      @expected_attr_count = (0..0)
 
       def self.keys
         ["--category"]
@@ -616,6 +672,16 @@ module Diary
 
       def parse!
         next_command! until @argv.empty?
+      end
+
+      def ensure_unique_commands!
+        @commands.uniq! do |c|
+          if c.is_a? Uniqueness
+            c.uniqueness
+          else
+            false
+          end || c.class
+        end
       end
 
       def available_commands
@@ -648,7 +714,8 @@ module Diary
       end
 
       def next_command!
-        cmd = @argv.pop
+        cmd = @argv.shift
+        debug "Shifted #{cmd} from #{@argv}"
         raise "Not a command: #{cmd}" if not Command.is_command? cmd
 
         debug "Searching for #{cmd}"
@@ -671,14 +738,17 @@ module Diary
       def create_instance!(c)
         instance = c.new()
 
-        i = 0
-        until (instance.expected_attr_count || []).include?(i) || @argv.empty? do
-          debug("Adding attribute to #{c} : #{@argv.first}")
-          instance.add_attribute(@argv.pop)
-          i += 1
+        0.upto(instance.expected_attr_count.max) do
+          break if @argv.empty?
+
+          if Command.is_command?(@argv.first)
+            debug("Not adding #{@argv.first} as arg to #{instance}")
+          else
+            debug("Adding attribute to #{c} : #{@argv.first}")
+            instance.add_attribute(@argv.shift)
+          end
         end
 
-        raise "Possibly not enough arguments for #{c}" if not i.zero?
         instance
       end
 
@@ -962,4 +1032,5 @@ if __FILE__ == $0
   cp.parse!
 
   puts cp.commands
+  puts cp.commands.map(&:inspect)
 end
