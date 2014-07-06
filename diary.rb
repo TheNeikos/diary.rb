@@ -1022,7 +1022,7 @@ module Diary
     def self.from_path(path, create_subs = false)
       @index = self.index_from_path(path, /[0-9]{2,2}$/)
       if create_subs
-        @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
+        @entries = self.subs_from_path(path, Entry) { |e| File.file? e }
       end
     end
 
@@ -1050,7 +1050,7 @@ module Diary
     def self.from_path(path, create_subs = false)
       @index = self.index_from_path(path, /[0-9]{2,2}$/)
       if create_subs
-        @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
+        @days = self.subs_from_path(path, Day) { |e| File.directory? e }
       end
     end
 
@@ -1074,7 +1074,7 @@ module Diary
       @path = path
       @year = self.year_from_path path
       if create_subs
-        @months = self.subs_from_path(path, Month, lambda { |e| File.directory? e })
+        @months = self.subs_from_path(path, Month) { |e| File.directory? e }
       end
     end
 
