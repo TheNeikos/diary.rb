@@ -902,7 +902,7 @@ module Diary
 
     attr_accessor :months
 
-    def initialize(months, y = false)
+    def initialize(months, path, y = false)
       @year = y || Date.today.year
       @months = months
     end
@@ -918,7 +918,7 @@ module Diary
         months = self.subs_from_path(path, Month) { |e| File.directory? e }
       end
 
-      Year.new(months, year)
+      Year.new(months, path, year)
     end
 
     def to_hash
