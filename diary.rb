@@ -777,6 +777,7 @@ module Diary
 
     def self.subs_from_path(path, gen_class, &block)
       Dir.new(path).entries.select(&block).map do |entry|
+        next if ["..", "."].include? entry
         gen_class.from_path(path + "/" + entry, true)
       end
     end
