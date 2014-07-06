@@ -24,6 +24,7 @@ require 'ostruct'
 require 'fileutils'
 require 'digest'
 require 'digest/sha2'
+require 'json'
 
 
 class Array
@@ -812,6 +813,10 @@ module Diary
       @hash ||= Digest::SHA512.hexdigest @raw
     end
 
+    def to_sym
+      @time.strftime("%H-%m-%S").to_sym
+    end
+
     def to_hash
       h = Hash.new
       h[:time]    = @time.to_s
@@ -840,12 +845,17 @@ module Diary
       @entries = entries
     end
 
+    def to_sym
+      @index.to_s.to_sym
+    end
+
     def to_hash
       h = Hash.new
       h[:tags]        = []
       h[:categories]  = []
       h[:path]        = @path
-      @entries.each { |e| h[e] = e.to_hash }
+      h[:entries]     = Hash.new
+      @entries.each { |e| h[:entries][e.to_sym] = e.to_hash }
       h
     end
 
@@ -884,13 +894,18 @@ module Diary
       Date::MONTHNAMES[@index].downcase
     end
 
+    def to_sym
+      @index.to_s.to_sym
+    end
+
     def to_hash
       h = Hash.new
       h[:tags]        = []
       h[:categories]  = []
       h[:index]       = @index
       h[:path]        = @path
-      @days.each { |d| h[d] = d.to_hash }
+      h[:days]        = Hash.new
+      @days.each { |d| h[:days][d.to_sym] = d.to_hash }
       h
     end
 
@@ -930,13 +945,18 @@ module Diary
       Year.new(months, path, year)
     end
 
+    def to_sym
+      @year.to_s.to_sym
+    end
+
     def to_hash
       h = Hash.new
       h[:tags]        = []
       h[:categories]  = []
       h[:path]        = @path
       h[:year]        = @year
-      @months.each { |month| h[month] = month.to_hash }
+      h[:months]      = Hash.new
+      @months.each { |month| h[:months][month.to_sym] = month.to_hash }
       h
     end
 
@@ -967,12 +987,17 @@ module Diary
       Tree.new(path, years)
     end
 
+    def to_sym
+      @path.to_s.to_sym
+    end
+
     def to_hash
       h = Hash.new
-      h[:tags] = []
-      h[:categories] = []
-      h[:path] = @path
-      @years.each { |year| h[year] = year.to_hash }
+      h[:tags]        = []
+      h[:categories]  = []
+      h[:path]        = @path
+      h[:years]       = Hash.new
+      @years.each { |year| h[:years][year.to_sym] = year.to_hash }
       h
     end
 
@@ -1022,7 +1047,7 @@ module Diary
       try_precommands and exit 0
 
       tree = build_tree
-      puts tree.to_hash
+      puts ::JSON.pretty_generate tree.to_hash
       tree = filter_tree(tree, filter_commands)
 
       run_queries(tree, query_commands)
