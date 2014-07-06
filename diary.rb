@@ -788,14 +788,9 @@ module Diary
     protected
 
     def try_precommands
-      pre = pre_commands
-      until pre.empty? do
-        p = pre.shift
-        c = @commands.select { |cmd| cmd.is_a? p }
-        if c.one?
-          c.first.action([])
-          return true
-        end
+      pre_commands.each do |pre|
+        c = @commands.select { |cmd| cmd.is_a? pre }
+        return (!!c.first.action([])) if c.one?
       end
       false
     end
