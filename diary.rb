@@ -168,6 +168,28 @@ module Diary
     end
 
 
+    class HelpCommand < Command
+      include InstanceAbleCommand
+
+      def self.keys
+        ["-h", "--help"]
+      end
+
+      def self.help
+        "Print the help and exit"
+      end
+
+      def action(tree)
+        CommandParser.constants.map do |c|
+          c.is_a? CommandParser::Command and c.is_a? InstanceAbleCommand
+        end.sort.each do |c|
+          puts "#{c.keys.join(", ")}\t#{c.help}"
+        end
+      end
+
+    end
+
+
     class QueryCommand < Command
     end
 
@@ -743,7 +765,7 @@ module Diary
 
       def available_commands
         [
-          Command,
+          HelpCommand,
           QueryCommand,
           CatCommand,
           CatLastCommand,
