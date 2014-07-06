@@ -278,8 +278,9 @@ module Diary
       end
 
       # override
+      alias super_add_attribute add_attribute
       def add_attribute a
-        super.add_attribute a
+        super_add_attribute a
         parse_attribute a
       end
 
