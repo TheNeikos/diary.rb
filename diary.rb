@@ -787,7 +787,7 @@ module Diary
       Dir.new(path).entries.select(&block).map do |entry|
         next if ["..", "."].include? entry
         gen_class.from_path(path + "/" + entry, reader_commands)
-      end
+      end.compact
     end
 
     def self.index_from_path(path, regex)
