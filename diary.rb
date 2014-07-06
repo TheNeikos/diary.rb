@@ -851,7 +851,9 @@ module Diary
     protected
 
     def self.time_from_path(path)
-      Time.parse path.match(/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/).to_s
+      r = /[0-9]{4,4}\/[0-9]{2,2}\/[0-9]{2,2}\/[0-2][0-9]-[0-9]{2,2}-[0-9]{2,2}/
+      pathpart = path.match(r).to_s
+      Time.strptime pathpart, "%Y/%m/%d/%H-%M-%S"
     end
 
   end
