@@ -25,6 +25,15 @@ require 'fileutils'
 require 'digest'
 require 'digest/sha2'
 
+
+class Array
+
+  def includes_any? other
+    other.lazy.map { |o| self.include? o }.any?
+  end
+
+end
+
 module Diary
 
   class Config < Hash
@@ -805,13 +814,9 @@ module Diary
     end
 
     def commands_compatible?
-      @commands.each do |command|
-        @commands.each do |other|
-          return false if command.class.noncompatible_commands.include? other
-        end
-      end
-
-      return true
+      not @commands.lazy.map do |cmd|
+        cmd.class.noncompatible_commands.includes_any? (@commands - [cmd])
+      end.any?
     end
 
     def filter_tree(tree, commands)
