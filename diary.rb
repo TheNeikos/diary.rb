@@ -877,7 +877,7 @@ module Diary
     def self.from_path(path, reader_commands)
       index = self.index_from_path(path, /[0-9]{2,2}$/)
       entries = self.subs_from_path(path, Entry, reader_commands) do |subpath|
-        File.file?(subpath) and reader_commands.lazy.map do |rcmd|
+        File.file?(path + "/" + subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? subpath
         end.any_or_none?
       end
@@ -923,7 +923,7 @@ module Diary
     def self.from_path(path, reader_commands)
       index = self.index_from_path(path, /[0-9]{2,2}$/)
       days = self.subs_from_path(path, Day, reader_commands) do |subpath|
-        File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
+        File.directory?(path + "/" + subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? subpath
         end.any_or_none?
       end
@@ -948,8 +948,8 @@ module Diary
 
     def self.from_path(path, reader_commands)
       year = self.year_from_path path
-      months = self.subs_from_path(path, Month, reader_commands) do |sub_path|
-        File.directory? sub_path and reader_commands.lazy.map do |rcmd|
+      months = self.subs_from_path(path, Month, reader_commands) do |subpath|
+        File.directory?(path + "/" + subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? sub_path
         end.any_or_none?
       end
@@ -993,7 +993,7 @@ module Diary
     def self.from_path(path, reader_commands)
       path = path
       years = self.subs_from_path(path, Year, reader_commands) do |subpath|
-        File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
+        File.directory?(path + "/" + subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? sub_path
         end.any_or_none?
       end
