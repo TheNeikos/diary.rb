@@ -871,6 +871,9 @@ module Diary
     end
 
     def execute!
+      help = @commands.select { |c| c.is_a? HelpCommand }
+      help.action if help
+
       catlast = query_commands.select { |c| c.is_a? CatLastCommand }
       if catlast
         catlast.action()
