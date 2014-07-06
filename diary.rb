@@ -814,8 +814,10 @@ module Diary
 
     def to_hash
       h = Hash.new
-      h[:time] = @time.to_s
+      h[:time]    = @time.to_s
       h[:content] = @content
+      h[:raw]     = @raw
+      h[:hash]    = @hash
       h
     end
 
@@ -840,6 +842,9 @@ module Diary
 
     def to_hash
       h = Hash.new
+      h[:tags]        = []
+      h[:categories]  = []
+      h[:path]        = @path
       @entries.each { |e| h[e] = e.to_hash }
       h
     end
@@ -881,6 +886,10 @@ module Diary
 
     def to_hash
       h = Hash.new
+      h[:tags]        = []
+      h[:categories]  = []
+      h[:index]       = @index
+      h[:path]        = @path
       @days.each { |d| h[d] = d.to_hash }
       h
     end
@@ -923,6 +932,10 @@ module Diary
 
     def to_hash
       h = Hash.new
+      h[:tags]        = []
+      h[:categories]  = []
+      h[:path]        = @path
+      h[:year]        = @year
       @months.each { |month| h[month] = month.to_hash }
       h
     end
@@ -956,6 +969,9 @@ module Diary
 
     def to_hash
       h = Hash.new
+      h[:tags] = []
+      h[:categories] = []
+      h[:path] = @path
       @years.each { |year| h[year] = year.to_hash }
       h
     end
