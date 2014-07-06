@@ -796,17 +796,16 @@ module Diary
     attr_accessor :time
     attr_reader :content, :raw, :hash
 
-    def initialize(time, content)
+    def initialize(time, path)
+      @path = path
       @time = time
+      content = File.read @path
       @content = content.encode(Encoding::UTF_8)
       @raw = content
     end
 
     def self.from_path(path)
-      time = self.time_from_path(path)
-      raw = File.read path
-
-      Entry.new(time, raw)
+      Entry.new(self.time_from_path(path), path)
     end
 
     def hash
