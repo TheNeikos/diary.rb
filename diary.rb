@@ -880,7 +880,7 @@ module Diary
       try_help
       try_catlast and exit 1
 
-      tree = Tree.from_path(@config[:content_dir], reader_commands)
+      tree = build_tree
       tree = filter_tree(tree, filter_commands)
 
       run_queries(tree)
@@ -901,6 +901,10 @@ module Diary
       else
         false
       end
+    end
+
+    def build_tree
+      Tree.from_path(@config[:content_dir], reader_commands)
     end
 
     def run_queries(tree)
