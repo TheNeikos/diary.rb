@@ -893,7 +893,7 @@ module Diary
         ListCommand.new(tree).action!
       else
         query_commands.each do |qcmd|
-          cmd.action!(tree)
+          qcmd.action!(tree)
         end
       end
     end
