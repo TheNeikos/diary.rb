@@ -913,22 +913,22 @@ module Diary
     end
 
     def reader_commands
-      only_commands ReaderCommand
+      only_commands CommandParser::ReaderCommand
     end
 
     def filter_commands
-      only_commands FilterCommand
+      only_commands CommandParser::FilterCommand
     end
 
     def limit_commands
-      only_commands LimitCommand
+      only_commands CommandParser::LimitCommand
     end
 
     def query_commands
-      only_commands QueryCommand
+      only_commands CommandParser::QueryCommand
     end
 
-    def only klass
+    def only_commands klass
       @commands.select { |c| c.is_a? klass }
     end
 
