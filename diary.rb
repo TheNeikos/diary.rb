@@ -1008,6 +1008,16 @@ module Diary
       @years.each(&block)
     end
 
+    def all_entries(&block)
+      @years.each do |year|
+        year.months.each do |month|
+          month.days.each do |day|
+            day.entries.each(&block)
+          end
+        end
+      end
+    end
+
     def keep_entries entries
       @years.each do |year|
         year.months.each do |month|
