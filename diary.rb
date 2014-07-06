@@ -186,6 +186,8 @@ module Diary
         end.sort.each do |c|
           puts "#{c.keys.join(", ")}\t#{c.help}"
         end
+
+        exit 1
       end
 
     end
