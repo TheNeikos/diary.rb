@@ -811,7 +811,7 @@ module Diary
   class Entry < TreeElement
 
     attr_accessor :time
-    attr_reader :content, :raw, :hash
+    attr_reader :content, :raw, :hash, :tags, :categories
 
     def initialize(time, path)
       @path = path
@@ -827,8 +827,17 @@ module Diary
       end
     end
 
+    def metadata
+      {
+        :path       => @path,
+        :time       => @time,
+        :tags       => @tags,
+        :categories => @categories,
+      }
+    end
+
     def hash
-      @hash ||= Digest::SHA512.hexdigest @raw
+      @hash ||= Digest::SHA512.hexdigest(@raw + metadata.to_s)
     end
 
     def abbrev_hash
