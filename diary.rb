@@ -111,10 +111,11 @@ module Diary
     end
 
     module InstanceAbleCommand
-      attr_reader :noncompatible_commands
 
       # All Not Compatible commands, can be superclass of own class
-      @@noncompatible_commands = []
+      def noncompatible_commands
+        []
+      end
 
       def self.help
         raise NoMethodException.new "Not implemented"
@@ -181,7 +182,7 @@ module Diary
       end
 
       def action(tree)
-        CommandParser.constants.map do |c|
+        CommandParser.constants.select do |c|
           c.is_a? CommandParser::Command and c.is_a? InstanceAbleCommand
         end.sort.each do |c|
           puts "#{c.keys.join(", ")}\t#{c.help}"
@@ -200,7 +201,9 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -212,7 +215,7 @@ module Diary
         "List entries only"
       end
 
-      def action!(tree)
+      def action(tree)
         tree.all_entries.each do |entry|
           puts "[#{entry.hash}] #{entry.time}"
         end
@@ -224,7 +227,9 @@ module Diary
       include ExecuteableCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..1)
 
@@ -237,9 +242,15 @@ module Diary
       end
 
       def action(tree)
-        tree.each do |entry|
-          cat entry
-          puts ""
+        tree.each do |y|
+          y.each do |m|
+            m.each do |d|
+              d.each do |entry|
+                cat entry
+                puts ""
+              end
+            end
+          end
         end
       end
 
@@ -262,7 +273,9 @@ module Diary
       include ConfigReaderCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -307,7 +320,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitCommand ]
+      def noncompatible_commands
+        [ LimitCommand ]
+      end
 
       @expected_attr_count = (1..1) # only one
 
@@ -382,7 +397,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitCommand ]
+      def noncompatible_commands
+        [ LimitCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -425,7 +442,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
 
@@ -458,7 +477,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
       @attributes = []
@@ -490,7 +511,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
       @attributes = []
@@ -654,7 +677,9 @@ module Diary
         "Add an entry. Default command."
       end
 
-      @@noncompatible_commands = [ Command ] # either add or something else.
+      def noncompatible_commands
+        [ Command ] # either add or something else.
+      end
 
       def action(tree)
         dir = generate_dir_path
@@ -694,8 +719,9 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      @@noncompatible_commands = [ LimitCommand, FilterCommand,
-                                  ModifyCommand, AddCommand ]
+      def noncompatible_commands
+        [ LimitCommand, FilterCommand, ModifyCommand, AddCommand ]
+      end
 
       def self.keys
         ["--edit"]
@@ -710,7 +736,9 @@ module Diary
     class TagCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @@noncompatible_commands = [ EditCommand ]
+      def noncompatible_commands
+        [ EditCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -727,7 +755,9 @@ module Diary
     class CategorizeCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @@noncompatible_commands = [ EditCommand ]
+      def noncompatible_commands
+        [ EditCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -840,35 +870,43 @@ module Diary
 
   class Executer
 
-    def initalize(config, commands)
+    def initialize(commands, config)
       @config = config
       @commands = commands
       raise "Invalid command state..." if not valid?
     end
 
     def execute!
-      catlast = query_commands.select { |c| c.is_a? CatLastCommand }
-      if catlast
-        catlast.action()
-        return
-      end
+      try_precommands and exit 0
 
-      tree = Tree.from_path(@config[:content_dir], reader_commands)
-      tree.filter!(filter_commands)
+      tree = build_tree
+      tree = filter_tree(tree, filter_commands)
 
-      run_queries(tree)
+      run_queries(tree, query_commands)
     end
 
     protected
 
-    def run_queries(tree)
-      if query_commands.empty?
-        ListCommand.new(tree).action!
-      else
-        query_commands.each do |qcmd|
-          cmd.action!(tree)
+    def try_precommands
+      pre = pre_commands
+      until pre.empty? do
+        p = pre.shift
+        c = @commands.select { |cmd| cmd.is_a? p }
+        if c.one?
+          c.first.action([])
+          return true
         end
       end
+      false
+    end
+
+    def build_tree
+      Tree.from_path(@config[:content_dir], reader_commands)
+    end
+
+    def run_queries(tree, queries)
+      queries << ListCommand.new if queries.empty?
+      queries.each { |qcmd| qcmd.action(tree) }
     end
 
     def valid?
@@ -878,61 +916,43 @@ module Diary
     def commands_compatible?
       @commands.each do |command|
         @commands.each do |other|
-          return false if command.class.noncompatible_commands.include? other
+          return false if command.noncompatible_commands.include? other
         end
       end
 
       return true
     end
 
+    def filter_tree(tree, commands)
+      tree
+    end
+
     def reader_commands
-      only_commands ReaderCommand
+      only_commands CommandParser::ReaderCommand
     end
 
     def filter_commands
-      only_commands FilterCommand
+      only_commands CommandParser::FilterCommand
     end
 
     def limit_commands
-      only_commands LimitCommand
+      only_commands CommandParser::LimitCommand
     end
 
     def query_commands
-      only_commands QueryCommand
+      only_commands CommandParser::QueryCommand
     end
 
-    def only klass
+    def only_commands klass
       @commands.select { |c| c.is_a? klass }
     end
 
-  end
-
-  module CreateAbleFromPath
-
-    attr_reader :path
-
-    def self.from_path(path)
-      raise NoMethodException.new("Not implemented")
-    end
-
-    def self.subs_from_path(path, gen_class, &block)
-      Dir.new(path).entries.select(&block).map do |entry|
-        gen_class.from_path(path + "/" + entry, true)
-      end
-    end
-
-  end
-
-  module Indexable
-
-    attr_reader :index
-
-    def index_str(n = 2)
-      @index.to_s.rjust(n, "0")
-    end
-
-    def self.index_from_path(path, regex)
-      path.match(regex).to_s.to_i
+    def pre_commands
+      [
+        CommandParser::HelpCommand,
+        CommandParser::ListCommand,
+        CommandParser::AddCommand
+      ]
     end
 
   end
@@ -945,9 +965,32 @@ module Diary
 
   end
 
-  class Entry
-    include CreateAbleFromPath
-    include Indexable
+  class TreeElement
+
+    attr_reader :path, :index
+
+    def self.from_path(path)
+      raise NoMethodException.new("Not implemented")
+    end
+
+    def self.subs_from_path(path, gen_class, &block)
+      Dir.new(path).entries.select(&block).map do |entry|
+        gen_class.from_path(path + "/" + entry, true)
+      end
+    end
+
+    def self.index_from_path(path, regex)
+      path.match(regex).to_s.to_i
+    end
+
+    def index_str(n = 2)
+      @index.to_s.rjust(n, "0")
+    end
+
+  end
+
+
+  class Entry < TreeElement
 
     attr_accessor :time
     attr_reader :content, :raw, :hash
@@ -977,9 +1020,7 @@ module Diary
 
   end
 
-  class Day
-    include CreateAbleFromPath
-    include Indexable
+  class Day < TreeElement
     include Iterateable
 
     attr_accessor :entries
@@ -994,17 +1035,18 @@ module Diary
     end
 
     def self.from_path(path, create_subs = false)
-      @index = self.index_from_path(path, /[0-9]{2,2}$/)
+      index = self.index_from_path(path, /[0-9]{2,2}$/)
+      entries = []
       if create_subs
-        @entries = self.subs_from_path(path, Entry, lambda { |e| File.file? e })
+        entries = self.subs_from_path(path, Entry) { |e| File.file? e }
       end
+
+      Day.new(entries, index)
     end
 
   end
 
-  class Month
-    include CreateAbleFromPath
-    include Indexable
+  class Month < TreeElement
     include Iterateable
 
     attr_accessor :days
@@ -1023,16 +1065,18 @@ module Diary
     end
 
     def self.from_path(path, create_subs = false)
-      @index = self.index_from_path(path, /[0-9]{2,2}$/)
+      index = self.index_from_path(path, /[0-9]{2,2}$/)
+      days = []
       if create_subs
-        @days = self.subs_from_path(path, Day, lambda { |e| File.directory? e })
+        days = self.subs_from_path(path, Day) { |e| File.directory? e }
       end
+
+      Month.new(days, index)
     end
 
   end
 
-  class Year
-    include CreateAbleFromPath
+  class Year < TreeElement
     include Iterateable
 
     attr_accessor :months
@@ -1047,11 +1091,13 @@ module Diary
     end
 
     def self.from_path(path, create_subs = false)
-      @path = path
-      @year = self.year_from_path path
+      year = self.year_from_path path
+      months = []
       if create_subs
-        @months = self.subs_from_path(path, Month, lambda { |e| File.directory? e })
+        months = self.subs_from_path(path, Month) { |e| File.directory? e }
       end
+
+      Year.new(months, year)
     end
 
     protected
@@ -1062,18 +1108,21 @@ module Diary
 
   end
 
-  class Tree
-    include CreateAbleFromPath
+  class Tree < TreeElement
     include Iterateable
 
     @years = []
 
-    def self.from_path(path,  create_subs = false)
+    def self.from_path(path, create_subs = false)
       @path = path
 
       if create_subs
-        @years = self.subs_from_path(path, Year, lambda { |e| File.directory? e })
+        @years = self.subs_from_path(path, Year) { |e| File.directory? e }
       end
+    end
+
+    def each(&block)
+      @years.each(&block)
     end
 
     def keep_entries entries
@@ -1109,10 +1158,20 @@ module Diary
 end
 
 if __FILE__ == $0
-  cp = Diary::CommandParser::Parser.new(ARGV, {:debug => true})
+  config = {
+    :debug => true,
+    :root => "/tmp",
+    :content_dir => "/tmp/content",
+  }
+  cp = Diary::CommandParser::Parser.new(ARGV, config)
   puts "Available: #{cp.available_commands.map(&:keys).flatten}"
   cp.parse!
 
   puts cp.commands
   puts cp.commands.map(&:inspect)
+
+  puts "---"
+
+  ex = Diary::Executer.new(cp.commands, config)
+  ex.execute!
 end
