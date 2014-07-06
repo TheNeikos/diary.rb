@@ -1084,7 +1084,6 @@ module Diary
       try_precommands and exit 0
 
       tree = build_tree
-      puts ::JSON.pretty_generate tree.to_hash
       tree = filter_tree(tree, filter_commands)
 
       run_queries(tree, query_commands)
@@ -1163,9 +1162,6 @@ if __FILE__ == $0
   }
   cp = Diary::CommandParser::Parser.new(ARGV, config)
   cp.parse!
-
-  puts cp.commands
-  puts cp.commands.map(&:inspect)
 
   ex = Diary::Executer.new(cp.commands, config)
   ex.execute!
