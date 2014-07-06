@@ -35,6 +35,14 @@ class Array
 
 end
 
+class Enumerator::Lazy
+
+  def any_or_none?
+    self.entries.empty? or self.entries.any?
+  end
+
+end
+
 module Diary
 
   class Config < Hash
@@ -869,7 +877,7 @@ module Diary
       entries = self.subs_from_path(path, Entry, reader_commands) do |subpath|
         File.file?(subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? subpath
-        end.any?
+        end.any_or_none?
       end
       Day.new(entries, path, index)
     end
@@ -915,7 +923,7 @@ module Diary
       days = self.subs_from_path(path, Day, reader_commands) do |subpath|
         File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? subpath
-        end.any?
+        end.any_or_none?
       end
       Month.new(days, path, index)
     end
@@ -941,7 +949,7 @@ module Diary
       months = self.subs_from_path(path, Month, reader_commands) do |sub_path|
         File.directory? sub_path and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? sub_path
-        end.any?
+        end.any_or_none?
       end
 
       Year.new(months, path, year)
@@ -985,7 +993,7 @@ module Diary
       years = self.subs_from_path(path, Year, reader_commands) do |subpath|
         File.directory?(subpath) and reader_commands.lazy.map do |rcmd|
           rcmd.search_in? sub_path
-        end.any?
+        end.any_or_none?
       end
       Tree.new(path, years)
     end
