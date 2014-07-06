@@ -934,22 +934,6 @@ module Diary
 
   end
 
-  module CreateAbleFromPath
-
-    attr_reader :path
-
-    def self.from_path(path)
-      raise NoMethodException.new("Not implemented")
-    end
-
-    def self.subs_from_path(path, gen_class, &block)
-      Dir.new(path).entries.select(&block).map do |entry|
-        gen_class.from_path(path + "/" + entry, true)
-      end
-    end
-
-  end
-
   module Indexable
 
     attr_reader :index
@@ -972,8 +956,24 @@ module Diary
 
   end
 
-  class Entry
-    include CreateAbleFromPath
+  class TreeElement
+
+    attr_reader :path
+
+    def self.from_path(path)
+      raise NoMethodException.new("Not implemented")
+    end
+
+    def self.subs_from_path(path, gen_class, &block)
+      Dir.new(path).entries.select(&block).map do |entry|
+        gen_class.from_path(path + "/" + entry, true)
+      end
+    end
+
+  end
+
+
+  class Entry < TreeElement
     include Indexable
 
     attr_accessor :time
@@ -1004,8 +1004,7 @@ module Diary
 
   end
 
-  class Day
-    include CreateAbleFromPath
+  class Day < TreeElement
     include Indexable
     include Iterateable
 
@@ -1029,8 +1028,7 @@ module Diary
 
   end
 
-  class Month
-    include CreateAbleFromPath
+  class Month < TreeElement
     include Indexable
     include Iterateable
 
@@ -1058,8 +1056,7 @@ module Diary
 
   end
 
-  class Year
-    include CreateAbleFromPath
+  class Year < TreeElement
     include Iterateable
 
     attr_accessor :months
@@ -1089,17 +1086,16 @@ module Diary
 
   end
 
-  class Tree
-    include CreateAbleFromPath
+  class Tree < TreeElement
     include Iterateable
 
     @years = []
 
-    def self.from_path(path,  create_subs = false)
+    def self.from_path(path, create_subs = false)
       @path = path
 
       if create_subs
-        @years = self.subs_from_path(path, Year, lambda { |e| File.directory? e })
+        @years = self.subs_from_path(path, Year) { |e| File.directory? e }
       end
     end
 
