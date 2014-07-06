@@ -56,34 +56,6 @@ module Diary
 
   end
 
-  class Options < Hash
-    def []=(k, v)
-      k = non_arg k
-      key, value = parse(k, v)
-      super[key] = value
-    end
-
-    def [](k)
-      super[non_arg(k)]
-    end
-
-    protected
-
-    def non_arg(str)
-      str.gsub(/^--/, "")
-    end
-
-    def parse(key, value)
-      if key.include? "="
-        key = key.split("=").first
-        value = { key.split("=")[1] => value }
-      end
-
-      [key, value]
-    end
-
-  end
-
   module CommandParser
 
     module ExecuteableCommand
