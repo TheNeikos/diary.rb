@@ -90,20 +90,9 @@ module Diary
 
     end
 
+    # Commands which are able to be instanciated and then executed should
+    # include this module
     module InstanceAbleCommand
-
-      def self.help
-        raise NoMethodException.new "Not implemented"
-      end
-
-      def self.keys
-        []
-      end
-
-      def keys
-        self.class.keys
-      end
-
     end
 
     # Commands which have an effect on the _reading_ of the tree should contain
