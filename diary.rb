@@ -206,7 +206,7 @@ module Diary
           year.months.each do |month|
             month.days.each do |day|
               day.entries.each do |entry|
-                puts "[#{entry.hash}] #{entry.time}"
+                puts "[#{entry.abbrev_hash}] #{entry.time}"
               end
             end
           end
@@ -829,6 +829,10 @@ module Diary
 
     def hash
       @hash ||= Digest::SHA512.hexdigest @raw
+    end
+
+    def abbrev_hash
+      hash[0,7]
     end
 
     def to_sym
