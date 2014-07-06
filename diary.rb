@@ -871,10 +871,10 @@ module Diary
     end
 
     def execute!
-      help = @commands.select { |c| c.is_a? HelpCommand }
+      help = @commands.select { |c| c.is_a? CommandParser::HelpCommand }
       help.action if help
 
-      catlast = query_commands.select { |c| c.is_a? CatLastCommand }
+      catlast = query_commands.select { |c| c.is_a? CommandParser::CatLastCommand }
       if catlast
         catlast.action()
         return
