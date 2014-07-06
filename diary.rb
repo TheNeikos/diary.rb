@@ -170,6 +170,7 @@ module Diary
 
     class HelpCommand < Command
       include InstanceAbleCommand
+      include ReaderCommand
 
       def self.keys
         ["-h", "--help"]
