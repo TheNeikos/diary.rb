@@ -883,7 +883,7 @@ module Diary
       tree = build_tree
       tree = filter_tree(tree, filter_commands)
 
-      run_queries(tree)
+      run_queries(tree, query_commands)
     end
 
     protected
@@ -907,14 +907,9 @@ module Diary
       Tree.from_path(@config[:content_dir], reader_commands)
     end
 
-    def run_queries(tree)
-      if query_commands.empty?
-        ListCommand.new(tree).action
-      else
-        query_commands.each do |qcmd|
-          qcmd.action(tree)
-        end
-      end
+    def run_queries(tree, queries)
+      queries << ListCommand.new if queries.empty?
+      queries.each { |qcmd| qcmd.action(tree) }
     end
 
     def valid?
