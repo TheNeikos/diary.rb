@@ -56,9 +56,6 @@ module Diary
 
   end
 
-
-
-
 end
 
 if __FILE__ == $0
