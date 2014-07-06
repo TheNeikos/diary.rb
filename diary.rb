@@ -1127,10 +1127,20 @@ module Diary
 end
 
 if __FILE__ == $0
-  cp = Diary::CommandParser::Parser.new(ARGV, {:debug => true})
+  config = {
+    :debug => true,
+    :root => "/tmp",
+    :content_dir => "/tmp/content",
+  }
+  cp = Diary::CommandParser::Parser.new(ARGV, config)
   puts "Available: #{cp.available_commands.map(&:keys).flatten}"
   cp.parse!
 
   puts cp.commands
   puts cp.commands.map(&:inspect)
+
+  puts "---"
+
+  ex = Diary::Executer.new(cp.commands, config)
+  ex.execute!
 end
