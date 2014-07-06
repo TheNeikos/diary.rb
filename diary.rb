@@ -111,10 +111,11 @@ module Diary
     end
 
     module InstanceAbleCommand
-      attr_reader :noncompatible_commands
 
       # All Not Compatible commands, can be superclass of own class
-      @@noncompatible_commands = []
+      def noncompatible_commands
+        []
+      end
 
       def self.help
         raise NoMethodException.new "Not implemented"
@@ -200,7 +201,9 @@ module Diary
       include InstanceAbleCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -224,7 +227,9 @@ module Diary
       include ExecuteableCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..1)
 
@@ -262,7 +267,9 @@ module Diary
       include ConfigReaderCommand
       include Uniqueness
 
-      @@noncompatible_commands = [ QueryCommand ]
+      def noncompatible_commands
+        [ QueryCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -307,7 +314,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitCommand ]
+      def noncompatible_commands
+        [ LimitCommand ]
+      end
 
       @expected_attr_count = (1..1) # only one
 
@@ -382,7 +391,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitCommand ]
+      def noncompatible_commands
+        [ LimitCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -425,7 +436,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
 
@@ -458,7 +471,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
       @attributes = []
@@ -490,7 +505,9 @@ module Diary
       include InstanceAbleCommand
       include ReaderCommand
 
-      @@noncompatible_commands = [ LimitRangeCommand, LimitInCommand ]
+      def noncompatible_commands
+        [ LimitRangeCommand, LimitInCommand ]
+      end
 
       @expected_attr_count = (1..1)
       @attributes = []
@@ -654,7 +671,9 @@ module Diary
         "Add an entry. Default command."
       end
 
-      @@noncompatible_commands = [ Command ] # either add or something else.
+      def noncompatible_commands
+        [ Command ] # either add or something else.
+      end
 
       def action(tree)
         dir = generate_dir_path
@@ -694,8 +713,9 @@ module Diary
 
       @expected_attr_count = (0..0)
 
-      @@noncompatible_commands = [ LimitCommand, FilterCommand,
-                                  ModifyCommand, AddCommand ]
+      def noncompatible_commands
+        [ LimitCommand, FilterCommand, ModifyCommand, AddCommand ]
+      end
 
       def self.keys
         ["--edit"]
@@ -710,7 +730,9 @@ module Diary
     class TagCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @@noncompatible_commands = [ EditCommand ]
+      def noncompatible_commands
+        [ EditCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
@@ -727,7 +749,9 @@ module Diary
     class CategorizeCommand < ModifyCommand
       include InstanceAbleCommand
 
-      @@noncompatible_commands = [ EditCommand ]
+      def noncompatible_commands
+        [ EditCommand ]
+      end
 
       @expected_attr_count = (0..0)
 
