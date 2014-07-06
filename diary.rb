@@ -832,7 +832,8 @@ module Diary
 
     attr_accessor :entries
 
-    def initialize(entries, day_index = false)
+    def initialize(entries, path, day_index = false)
+      @path = path
       @index = day_index || Date.today.day
       @entries = entries
     end
@@ -854,7 +855,7 @@ module Diary
         entries = self.subs_from_path(path, Entry) { |e| File.file? e }
       end
 
-      Day.new(entries, index)
+      Day.new(entries, path, index)
     end
 
   end
