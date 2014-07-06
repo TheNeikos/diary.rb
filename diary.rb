@@ -242,9 +242,15 @@ module Diary
       end
 
       def action(tree)
-        tree.each do |entry|
-          cat entry
-          puts ""
+        tree.each do |y|
+          y.each do |m|
+            m.each do |d|
+              d.each do |entry|
+                cat entry
+                puts ""
+              end
+            end
+          end
         end
       end
 
@@ -1092,6 +1098,10 @@ module Diary
       if create_subs
         @years = self.subs_from_path(path, Year) { |e| File.directory? e }
       end
+    end
+
+    def each(&block)
+      @years.each(&block)
     end
 
     def keep_entries entries
