@@ -914,11 +914,16 @@ module Diary
 
     @years = []
 
-    def self.from_path(path, create_subs = false)
+    def initialize(path, years)
       @path = path
+      @years = years
+    end
+
+    def self.from_path(path, create_subs = false)
+      path = path
 
       if create_subs
-        @years = self.subs_from_path(path, Year) { |e| File.directory? e }
+        years = self.subs_from_path(path, Year) { |e| File.directory? e }
       end
     end
 
