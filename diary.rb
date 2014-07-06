@@ -813,6 +813,13 @@ module Diary
       @hash ||= Digest::SHA512.hexdigest @raw
     end
 
+    def to_hash
+      h = Hash.new
+      h[:time] = @time.to_s
+      h[:content] = @content
+      h
+    end
+
     protected
 
     def self.time_from_path(path)
@@ -829,6 +836,12 @@ module Diary
     def initialize(entries, day_index = false)
       @index = day_index || Date.today.day
       @entries = entries
+    end
+
+    def to_hash
+      h = Hash.new
+      @entries.each { |e| h[e] = e.to_hash }
+      h
     end
 
     def each &block
@@ -863,6 +876,12 @@ module Diary
 
     def name
       Date::MONTHNAMES[@index].downcase
+    end
+
+    def to_hash
+      h = Hash.new
+      @days.each { |d| h[d] = d.to_hash }
+      h
     end
 
     def self.from_path(path, create_subs = false)
@@ -901,6 +920,12 @@ module Diary
       Year.new(months, year)
     end
 
+    def to_hash
+      h = Hash.new
+      @months.each { |month| h[month] = month.to_hash }
+      h
+    end
+
     protected
 
     def self.year_from_path path
@@ -925,6 +950,13 @@ module Diary
       if create_subs
         years = self.subs_from_path(path, Year) { |e| File.directory? e }
       end
+      Tree.new(path, years)
+    end
+
+    def to_hash
+      h = Hash.new
+      @years.each { |year| h[year] = year.to_hash }
+      h
     end
 
     def each(&block)
@@ -973,6 +1005,7 @@ module Diary
       try_precommands and exit 0
 
       tree = build_tree
+      puts tree.to_hash
       tree = filter_tree(tree, filter_commands)
 
       run_queries(tree, query_commands)
