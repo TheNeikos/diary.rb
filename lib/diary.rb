@@ -31,6 +31,10 @@ require './enumerator/lazy.rb'
 
 require './config.rb'
 require './commands.rb'
-require './tree_elements.rb'
+require './tree_elements/tree_element.rb'
+require './tree_elements/day.rb'
+require './tree_elements/month.rb'
+require './tree_elements/year.rb'
+require './tree_elements/tree.rb'
 require './iterateable.rb'
 
