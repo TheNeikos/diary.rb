@@ -26,17 +26,17 @@ require 'digest'
 require 'digest/sha2'
 require 'json'
 
-require './array/array.rb'
-require './enumerator/lazy.rb'
+require './diary/override/array.rb'
+require './diary/enumerator/lazy.rb'
 
-require './config.rb'
-require './commands.rb'
-require './tree_elements/tree_element.rb'
-require './tree_elements/day.rb'
-require './tree_elements/month.rb'
-require './tree_elements/year.rb'
-require './tree_elements/tree.rb'
-require './iterateable.rb'
+require './diary/config.rb'
+require './diary/commands.rb'
+require './diary/tree_elements/tree_element.rb'
+require './diary/tree_elements/day.rb'
+require './diary/tree_elements/month.rb'
+require './diary/tree_elements/year.rb'
+require './diary/tree_elements/tree.rb'
+require './diary/iterateable.rb'
 
 if __FILE__ == $0
   config = {

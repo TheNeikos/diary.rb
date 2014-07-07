@@ -1,4 +1,5 @@
-class Entry < TreeElement
+module Diary
+  class Entry < TreeElement
 
     attr_accessor :time
     attr_reader :content, :raw, :hash, :tags, :categories
@@ -56,3 +57,4 @@ class Entry < TreeElement
     end
 
   end
+end
