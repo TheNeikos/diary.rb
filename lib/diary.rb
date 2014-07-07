@@ -29,14 +29,15 @@ require 'json'
 require './diary/override/array.rb'
 require './diary/enumerator/lazy.rb'
 
+require './diary/iterateable.rb'
 require './diary/config.rb'
 require './diary/commands.rb'
+require './diary/executer.rb'
 require './diary/tree_elements/tree_element.rb'
 require './diary/tree_elements/day.rb'
 require './diary/tree_elements/month.rb'
 require './diary/tree_elements/year.rb'
 require './diary/tree_elements/tree.rb'
-require './diary/iterateable.rb'
 
 if __FILE__ == $0
   config = {
